@@ -6,6 +6,11 @@ node_modules
 .bundle
 vendor
 
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
 # Xcode
 #
 # gitignore contributors: remember to update Global/Xcode.gitignore, Objective-C.gitignore & Swift.gitignore

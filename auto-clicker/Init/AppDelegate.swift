@@ -22,7 +22,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         // Hacky workaround in SwiftUI in order to have macOS persist the window size state
         // https://stackoverflow.com/a/72558375/4494375
-        NSApp.windows[0].delegate = self
+        NSApp.windows.first?.delegate = self
 
         MenuBarService.refreshState()
 
@@ -35,7 +35,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
-        WindowStateService.shouldExitOnClose()
+        // Hiding the app (Cmd+H, or the menu bar's Hide option) orders out all regular windows, which
+        // AppKit then treats as "the last window was closed" and terminates us. Status bar windows do
+        // not count as regular windows, so they don't prevent the check. Only quit if we're actually
+        // visible and the user has opted in to quitting on close.
+        guard !sender.isHidden else {
+            return false
+        }
+
+        return WindowStateService.shouldExitOnClose()
     }
 
     func applicationWillBecomeActive(_ notification: Notification) {
@@ -45,16 +53,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
     func applicationDidHide(_ notification: Notification) {
         if let hideOrShowMenuItem = MenuBarService.hideOrShowMenuItem {
             hideOrShowMenuItem.title = NSLocalizedString("menu_bar_item_hide_show_show", comment: "Menu bar item show option")
-                + " "
-                + NSLocalizedString("menu_bar_item_hide_show_suffix", comment: "Menu bar item show/hide option suffix")
         }
     }
 
     func applicationDidUnhide(_ notification: Notification) {
         if let hideOrShowMenuItem = MenuBarService.hideOrShowMenuItem {
             hideOrShowMenuItem.title = NSLocalizedString("menu_bar_item_hide_show_hide", comment: "Menu bar item hide option")
-                + " "
-                + NSLocalizedString("menu_bar_item_hide_show_suffix", comment: "Menu bar item show/hide option suffix")
         }
     }
 
