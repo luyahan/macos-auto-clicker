@@ -67,6 +67,9 @@
 "settings_general_menu_bar_hide_dock" = "Dock-Symbol ausblenden";
 "settings_general_menu_bar_hide_dock_help" = "Anstatt die App aus dem Dock zu starten, wird die App aus der Menüleiste gestartet.";
 
+"settings_general_menu_bar_hide_dock_on_close" = "Dock-Symbol ausblenden, wenn das Fenster geschlossen wird";
+"settings_general_menu_bar_hide_dock_on_close_help" = "Das Dock-Symbol wird ausgeblendet, während die App ohne geöffnetes Fenster aus der Menüleiste läuft, und erscheint wieder, wenn das Fenster erneut angezeigt wird.";
+
 "settings_keyboard_shortcuts_title" = "Global";
 "settings_keyboard_shortcuts_start" = "Auto Clicker starten";
 "settings_keyboard_shortcuts_stop" = "Auto Clicker stoppen";

@@ -15,6 +15,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         WindowStateService.refreshDockIconState()
+        WindowStateService.startObservingWindowState()
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -32,6 +33,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         if Defaults[.mouseStartOnMove] {
             AutoClickSimulator.shared.startMouseStartMonitoring()
         }
+
+        // From here on out we can safely decide whether the dock icon should be shown based on the
+        //  state of our windows, so re-apply the preference now that everything is on screen.
+        WindowStateService.markFullyLaunched()
+        WindowStateService.refreshDockIconState()
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {

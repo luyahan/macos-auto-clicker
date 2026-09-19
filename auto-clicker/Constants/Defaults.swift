@@ -17,6 +17,7 @@ extension Defaults.Keys {
     static let menuBarShowIcon = Key<Bool>("menu_bar_show_icon", default: true)
     static let menuBarShowDynamicIcon = Key<Bool>("menu_bar_show_dynamic_icon", default: false)
     static let menuBarHideDock = Key<Bool>("menu_bar_hide_dock", default: false)
+    static let menuBarHideDockOnClose = Key<Bool>("menu_bar_hide_dock_on_close", default: true)
 
     static let appearanceSelectedTheme = Key<ThemeService>("appearance_selected_theme", default: ThemeService())
 

@@ -74,6 +74,9 @@
 "settings_general_menu_bar_hide_dock"      = "Hide dock icon";
 "settings_general_menu_bar_hide_dock_help" = "Instead of the app running from the dock, the app will instead run from the menu bar.";
 
+"settings_general_menu_bar_hide_dock_on_close"      = "Hide dock icon when the window is closed";
+"settings_general_menu_bar_hide_dock_on_close_help" = "The dock icon is hidden while the app runs from the menu bar with no window open, and comes back when the window is shown again.";
+
 "settings_keyboard_shortcuts_title" = "Global";
 "settings_keyboard_shortcuts_start" = "Start auto clicker";
 "settings_keyboard_shortcuts_stop"  = "Stop auto clicker";

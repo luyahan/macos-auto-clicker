@@ -266,6 +266,10 @@ final class MenuBarService {
 
     @objc static func menuActionHideOrShow(sender: NSMenuItem) {
         if NSApp.isHidden {
+            // If the dock icon was hidden while the app was hidden we're running as an accessory app,
+            //  which cannot reliably activate itself, so restore the regular policy first.
+            WindowStateService.prepareForShowingWindows()
+
             NSApp.activate(ignoringOtherApps: true)
             NSApp.unhide(sender)
         } else {

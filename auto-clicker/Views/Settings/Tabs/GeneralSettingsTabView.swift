@@ -13,6 +13,7 @@ import UserNotifications
 
 struct GeneralSettingsTabView: View {
     @Default(.menuBarShowIcon) private var menuBarShowIcon
+    @Default(.menuBarHideDock) private var menuBarHideDock
     @Default(.appShouldQuitOnClose) private var appShouldQuitOnClose
     @Default(.autoClickerState) private var formState
 
@@ -94,8 +95,7 @@ struct GeneralSettingsTabView: View {
             }
 
             SettingsTabItemView(
-                help: "settings_general_menu_bar_hide_dock_help",
-                divider: true
+                help: "settings_general_menu_bar_hide_dock_help"
             ) {
                 Defaults.Toggle(
                     " " + String(format: NSLocalizedString("settings_general_menu_bar_hide_dock", comment: "Hide dock icon toggle")),
@@ -105,6 +105,20 @@ struct GeneralSettingsTabView: View {
                     WindowStateService.refreshDockIconState()
                 }
                 .disabled(!self.menuBarShowIcon)
+            }
+
+            SettingsTabItemView(
+                help: "settings_general_menu_bar_hide_dock_on_close_help",
+                divider: true
+            ) {
+                Defaults.Toggle(
+                    " " + String(format: NSLocalizedString("settings_general_menu_bar_hide_dock_on_close", comment: "Hide dock icon when the window is closed toggle")),
+                    key: .menuBarHideDockOnClose
+                )
+                .onChange { _ in
+                    WindowStateService.refreshDockIconState()
+                }
+                .disabled(!self.menuBarShowIcon || self.menuBarHideDock)
             }
 
             SettingsTabItemView(
