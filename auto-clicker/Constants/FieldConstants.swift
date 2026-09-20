@@ -32,8 +32,12 @@ let MAX_PRESS_INPUTS: Int = 5
 
 let DEFAULT_PRESS_INPUTS: Int = 1
 
-// Delay between each input within a single press cycle, in milliseconds
+// Delay between each input within a single press cycle, in milliseconds. Used when the caller
+// does not supply its own inter-key delay, which is what the legacy settings tab does.
 let PRESS_INPUT_INTERVAL: Int = 100
+
+// How long a "long press" mode macro holds its combination down for, in milliseconds.
+let LONG_PRESS_HOLD_INTERVAL: Int = 2000
 
 // MARK: - Amount of times to repeat all actions
 

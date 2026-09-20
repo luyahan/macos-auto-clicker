@@ -23,6 +23,23 @@ extension Defaults.Keys {
 
     static let autoClickerState = Key<FormState>("user_form_state", default: FormState())
 
+    static let macros = Key<[Macro]>("macro_list", default: [])
+
+    static let activeMacroID = Key<UUID?>("macro_active_id", default: nil)
+
+    /// Marks that the seed macros have already been offered to the user once.
+    ///
+    /// Seeding and the initial activation used to be decided from `macros.isEmpty` and
+    ///  `activeMacroID == nil`, which are both legitimate states a user can reach on purpose: delete
+    ///  every macro, or click the armed row to disarm it. Both then came back on the next launch.
+    ///  A dedicated flag distinguishes "never initialised" from "deliberately empty".
+    static let macrosSeeded = Key<Bool>("macro_list_seeded", default: false)
+
+    /// Backing store for the stats card's "今日触发" figure. The day is kept alongside the count so
+    ///  that a total recorded yesterday is discarded rather than shown as today's.
+    static let triggerCountToday = Key<Int>("macro_trigger_count", default: 0)
+    static let triggerCountDay = Key<String>("macro_trigger_day", default: "")
+
     static let notifyOnStart = Key<Bool>("notify_on_start", default: false)
     static let notifyOnFinish = Key<Bool>("notify_on_finish", default: false)
 

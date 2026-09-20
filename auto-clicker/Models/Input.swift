@@ -36,6 +36,33 @@ extension Input {
 }
 
 extension Input {
+    /// A mouse click for the macro layer.
+    ///
+    /// The `type` has to be one of the six types `AutoClickSimulator`'s mouse event maps know about,
+    ///  because those maps are force unwrapped when the click is generated. The button number is
+    ///  carried in `keyCode` so that the side buttons can be told apart — they all report as
+    ///  `otherMouse` and the type alone cannot distinguish them.
+    init(mouseButton: Int, modifiers: [Modifier] = []) {
+        switch mouseButton {
+        case 1:
+            self.readable = "RMB"
+            self.type = .rightMouseDown
+        case 2:
+            self.readable = "MMB"
+            self.type = .otherMouseDown
+        default:
+            self.readable = "LMB"
+            self.type = .leftMouseDown
+        }
+
+        self.keyCode = UInt16(max(0, mouseButton))
+        self.modifiers = modifiers
+        self.isMouseInput = true
+        self.isRepeat = false
+    }
+}
+
+extension Input {
     init(_ event: NSEvent) {
         self.readable = event.inputString
         self.type = event.type

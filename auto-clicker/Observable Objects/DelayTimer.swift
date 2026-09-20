@@ -23,8 +23,12 @@ final class DelayTimer: ObservableObject {
     private var timer: Timer?
     private var activity: Cancellable?
 
-    func start(onFinish: @escaping () -> Void) {
-        let delayInSeconds = Defaults[.autoClickerState].startDelay
+    /// Starts the countdown.
+    ///
+    /// `seconds` lets a macro supply its own delay for this run only; when it is `nil` the delay from
+    ///  the settings tab is used, which is what the menu bar has always done.
+    func start(seconds: Int? = nil, onFinish: @escaping () -> Void) {
+        let delayInSeconds = seconds ?? Defaults[.autoClickerState].startDelay
 
         self.onFinish = onFinish
 

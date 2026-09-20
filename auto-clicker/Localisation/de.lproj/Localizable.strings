@@ -126,3 +126,62 @@
 "left_mouse_click" = "Linke Maustaste";
 "right_mouse_click" = "Rechte Maustaste";
 "middle_mouse_click" = "Mittlere Maustaste";
+
+/* Macro manager ("TriggerPilot") */
+
+"app_title" = "TriggerPilot";
+
+"macro_exclusive_notice"      = "Es ist immer nur ein Makro aktiv, beim Umschalten werden alle anderen deaktiviert";
+"macro_add"                   = "Neues Makro";
+"macro_status_listening"      = "Aktiv";
+"macro_stat_saved"            = "Gespeicherte Makros";
+"macro_stat_active"           = "Aktiv";
+"macro_stat_triggered"        = "Heute ausgeloest";
+
+"macro_key_count"             = "%lld Tasten";
+"macro_untitled"              = "Unbenanntes Makro %d";
+
+"macro_mode_simultaneous"     = "Gleichzeitig";
+"macro_mode_sequential"       = "Nacheinander";
+"macro_mode_long_press"       = "2 Sek. halten";
+
+"macro_seed_1_name"           = "Screenshot in die Zwischenablage";
+"macro_seed_2_name"           = "Zwischenablage aufraeumen";
+"macro_seed_3_name"           = "Code formatieren und committen";
+"macro_seed_4_name"           = "Stumm + Meeting-Aufnahme starten";
+"macro_seed_5_name"           = "Ausgewaehlte Dateien umbenennen";
+
+"macro_settings_title"        = "Makro-Einstellungen";
+"macro_enabled_chip"          = "Aktiviert";
+"macro_close"                 = "Schliessen";
+
+"macro_field_name"            = "Makroname";
+"macro_field_combo"           = "Tastenkombination";
+"macro_field_mode"            = "Ausloesemodus";
+
+"macro_options_header"        = "Optionale Einstellungen";
+"macro_option_repeat"         = "Wiederholungen";
+"macro_option_delay"          = "Verzoegerung";
+"macro_option_hint"           = "Wird abhaengig vom Ausloesemodus oben angezeigt";
+"macro_option_interval"       = "Intervall (nacheinander)";
+"macro_option_interval_hint"  = "Gilt nur bei Nacheinander";
+"macro_option_round_interval" = "Intervall (Runden)";
+"macro_option_round_interval_hint" = "Wartezeit zwischen den Runden, gilt fuer alle Modi";
+"macro_round_interval_value"  = "%@ Sek.";
+"macro_delay_value"           = "%@ Sek.";
+
+"macro_delete"                = "Makro loeschen";
+"macro_save"                  = "Aenderungen speichern";
+
+"macro_capture_prompt"        = "Neue Taste oder Maustaste druecken";
+"macro_capture_hint"          = "Esc zum Abbrechen";
+"macro_slot_empty"            = "Leere Taste";
+"macro_slot_replace"          = "Taste ersetzen";
+"macro_slot_remove"           = "Taste entfernen";
+"macro_slot_add"              = "Taste hinzufuegen";
+
+"macro_status_running"        = "Laeuft";
+"macro_error_none_armed"      = "Kein Makro aktiv, bitte zuerst links einen Kreis anklicken";
+"macro_error_no_key"          = "Dieses Makro hat nur Modifikatortasten";
+"macro_error_simultaneous_multi_key" = "\"Gleichzeitig\" erlaubt nur eine normale Taste, weitere werden ignoriert";
+"macro_started_title"         = "Gestartet: %@";

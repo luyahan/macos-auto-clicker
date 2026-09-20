@@ -27,6 +27,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
         MenuBarService.refreshState()
 
+        // Registered here rather than only in the view so the shortcuts work while the permissions
+        //  screen is up, and so the menu bar's Start/Stop items and the shortcuts share one path.
+        MacroRunner.shared.registerKeyboardShortcuts()
+
         PermissionsService.acquireAccessibilityPrivileges()
 
         // Initialize mouse start monitoring if enabled

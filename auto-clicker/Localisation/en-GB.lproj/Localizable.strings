@@ -134,3 +134,68 @@
 "left_mouse_click" = "Left Mouse";
 "right_mouse_click" = "Right Mouse";
 "middle_mouse_click" = "Middle Mouse";
+
+/* =====================================================================================
+   Macro manager ("TriggerPilot")
+
+   The values in this file are the design file's own copy, kept verbatim so the built app can
+   be diffed against the Ardot source (file 727793516651652) without a translation layer in
+   the way. Replace them with English copy once the layout has been signed off.
+   ===================================================================================== */
+
+"app_title" = "TriggerPilot";
+
+"macro_exclusive_notice"      = "同一时间仅启用一个宏，切换即停用其他";
+"macro_add"                   = "新建宏";
+"macro_status_listening"      = "监听中";
+"macro_stat_saved"            = "已保存宏";
+"macro_stat_active"           = "当前启用";
+"macro_stat_triggered"        = "今日触发";
+
+"macro_key_count"             = "%lld 键";
+"macro_untitled"              = "未命名宏 %d";
+
+"macro_mode_simultaneous"     = "同时按下";
+"macro_mode_sequential"       = "依次触发";
+"macro_mode_long_press"       = "长按 2 秒";
+
+"macro_seed_1_name"           = "截图并复制到剪贴板";
+"macro_seed_2_name"           = "一键整理剪贴板";
+"macro_seed_3_name"           = "代码格式化并提交";
+"macro_seed_4_name"           = "静音 + 开始会议录制";
+"macro_seed_5_name"           = "批量重命名选中文件";
+
+"macro_settings_title"        = "宏设置";
+"macro_enabled_chip"          = "已启用";
+"macro_close"                 = "关闭";
+
+"macro_field_name"            = "宏名称";
+"macro_field_combo"           = "按键组合";
+"macro_field_mode"            = "触发方式";
+
+"macro_options_header"        = "可选选项";
+"macro_option_repeat"         = "重复次数";
+"macro_option_delay"          = "延迟执行";
+"macro_option_hint"           = "随上方「触发方式」联动显示";
+"macro_option_interval"       = "依次触发间隔";
+"macro_option_interval_hint"  = "仅「依次触发」时生效";
+"macro_option_round_interval" = "轮次间隔";
+"macro_option_round_interval_hint" = "每一轮之间的等待，所有触发方式生效";
+"macro_round_interval_value"  = "%@ 秒";
+"macro_delay_value"           = "%@ 秒";
+
+"macro_delete"                = "删除宏";
+"macro_save"                  = "保存修改";
+
+"macro_capture_prompt"        = "请按下新的按键或鼠标键";
+"macro_capture_hint"          = "按 Esc 取消";
+"macro_slot_empty"            = "空按键";
+"macro_slot_replace"          = "替换按键";
+"macro_slot_remove"           = "移除按键";
+"macro_slot_add"              = "添加按键";
+
+"macro_status_running"        = "运行中";
+"macro_error_none_armed"      = "未启用任何宏，请先点击左侧圆圈启用一个宏";
+"macro_error_no_key"          = "该宏只有修饰键，没有可触发的按键";
+"macro_error_simultaneous_multi_key" = "「同时按下」只能有一个普通按键，多余的按键不会被触发";
+"macro_started_title"         = "已启动：%@";

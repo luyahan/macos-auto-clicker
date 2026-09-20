@@ -127,3 +127,62 @@
 "left_mouse_click" = "Click izquierdo";
 "right_mouse_click" = "Click derecho";
 "middle_mouse_click" = "Click en el medio";
+
+/* Macro manager ("TriggerPilot") */
+
+"app_title" = "TriggerPilot";
+
+"macro_exclusive_notice"      = "Solo puede haber un macro activo a la vez; al cambiar se desactivan los demas";
+"macro_add"                   = "Nuevo macro";
+"macro_status_listening"      = "Escuchando";
+"macro_stat_saved"            = "Macros guardados";
+"macro_stat_active"           = "Activo";
+"macro_stat_triggered"        = "Activados hoy";
+
+"macro_key_count"             = "%lld teclas";
+"macro_untitled"              = "Macro sin titulo %d";
+
+"macro_mode_simultaneous"     = "Simultaneo";
+"macro_mode_sequential"       = "Secuencial";
+"macro_mode_long_press"       = "Mantener 2 s";
+
+"macro_seed_1_name"           = "Capturar pantalla y copiar";
+"macro_seed_2_name"           = "Ordenar el portapapeles";
+"macro_seed_3_name"           = "Formatear y confirmar codigo";
+"macro_seed_4_name"           = "Silenciar e iniciar grabacion";
+"macro_seed_5_name"           = "Renombrar archivos seleccionados";
+
+"macro_settings_title"        = "Ajustes del macro";
+"macro_enabled_chip"          = "Activado";
+"macro_close"                 = "Cerrar";
+
+"macro_field_name"            = "Nombre del macro";
+"macro_field_combo"           = "Combinacion de teclas";
+"macro_field_mode"            = "Modo de activacion";
+
+"macro_options_header"        = "Opciones adicionales";
+"macro_option_repeat"         = "Repeticiones";
+"macro_option_delay"          = "Retardo";
+"macro_option_hint"           = "Se muestra segun el modo de activacion";
+"macro_option_interval"       = "Intervalo secuencial";
+"macro_option_interval_hint"  = "Solo se aplica en modo secuencial";
+"macro_option_round_interval" = "Intervalo entre rondas";
+"macro_option_round_interval_hint" = "Espera entre rondas, se aplica a todos los modos";
+"macro_round_interval_value"  = "%@ s";
+"macro_delay_value"           = "%@ s";
+
+"macro_delete"                = "Eliminar macro";
+"macro_save"                  = "Guardar cambios";
+
+"macro_capture_prompt"        = "Pulsa una tecla o boton del raton";
+"macro_capture_hint"          = "Esc para cancelar";
+"macro_slot_empty"            = "Tecla vacia";
+"macro_slot_replace"          = "Reemplazar tecla";
+"macro_slot_remove"           = "Quitar tecla";
+"macro_slot_add"              = "Anadir tecla";
+
+"macro_status_running"        = "En ejecucion";
+"macro_error_none_armed"      = "Ninguna macro activa, haz clic en un circulo de la izquierda";
+"macro_error_no_key"          = "Esta macro solo tiene teclas modificadoras";
+"macro_error_simultaneous_multi_key" = "\"Simultaneo\" admite una sola tecla normal, las demas se ignoran";
+"macro_started_title"         = "Iniciado: %@";

@@ -24,7 +24,10 @@ struct AutoClickerApp: App {
                        maxHeight: WindowStateService.mainWindowMinHeight)
         }
         .windowStyle(.hiddenTitleBar)
-        .windowResizability(.contentSize)
+        // `.contentSize` would size the *content* area to 620 and let AppKit add the title bar
+        //  strip on top, producing a 652pt window. `TPWindowConfigurator` pins both the content
+        //  size and the frame instead, so SwiftUI must not also manage them.
+        .windowResizability(.contentMinSize)
         .commands {
             HelpCommands()
 

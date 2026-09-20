@@ -15,14 +15,22 @@ struct ACWindow: View {
 
     var body: some View {
         ZStack {
-            self.activeTheme.backgroundColour.ignoresSafeArea()
-
             if self.permissionsService.isTrusted {
-                MainView()
+                TriggerPilotView()
             } else {
+                self.activeTheme.backgroundColour.ignoresSafeArea()
+
                 PermissionsView()
             }
         }
+        // The window reserves a title bar strip even though `.hiddenTitleBar` makes it invisible.
+        //  Without this the SwiftUI content is inset below that strip, which showed up as an empty
+        //  band above the design's own title bar.
+        .ignoresSafeArea()
+        // Window chrome configuration lives here rather than inside `TriggerPilotView` so that it
+        //  also applies while the permissions screen is showing — otherwise the window would keep
+        //  the stock title bar (and its extra height) until permissions were granted.
+        .background(TPWindowConfigurator())
         .onAppear {
             self.permissionsService.pollAccessibilityPrivileges(onTrusted: {
                 MenuBarService.enableAllMenuBarItems()

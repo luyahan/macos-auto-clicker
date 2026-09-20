@@ -254,14 +254,13 @@ final class MenuBarService {
     }
 
     @objc static func menuActionStart(sender: NSMenuItem) {
-        AutoClickSimulator.shared.start()
+        // Routed through the runner so the menu item, the shortcut and the title bar switch all
+        //  arm the same macro instead of the menu re-running the settings tab's own inputs.
+        MacroRunner.shared.start()
     }
 
     @objc static func menuActionStop(sender: NSMenuItem) {
-        // Must also stop the delay timer, otherwise a running countdown would complete and fire
-        // its onFinish handler, restarting the simulator the user just asked to stop.
-        DelayTimer.shared.stop()
-        AutoClickSimulator.shared.stop()
+        MacroRunner.shared.stop()
     }
 
     @objc static func menuActionHideOrShow(sender: NSMenuItem) {

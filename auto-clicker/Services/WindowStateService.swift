@@ -10,9 +10,12 @@ import Cocoa
 import Defaults
 
 struct WindowStateService {
-    static let mainWindowMinWidth: CGFloat = 600
-    static let mainWindowMinHeight: CGFloat = 430
-    static let mainWindowMaxDimensionMultiplier: CGFloat = 1.3
+    // The main window is a fixed-size macro manager, so its minimum, ideal and maximum
+    //  dimensions all resolve to the same 420x620 box. The multiplier is left in place because
+    //  `AutoClickerApp` still multiplies by it.
+    static let mainWindowMinWidth: CGFloat = 420
+    static let mainWindowMinHeight: CGFloat = 620
+    static let mainWindowMaxDimensionMultiplier: CGFloat = 1.0
 
     static let settingsMinWidth: CGFloat = 600
 
