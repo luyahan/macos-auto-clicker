@@ -26,7 +26,7 @@ final class AutoClickSimulator: ObservableObject {
     private var duration: Duration = .milliseconds
     private var interval: Int = DEFAULT_PRESS_INTERVAL
     private var amountOfPresses: Int = DEFAULT_REPEAT_AMOUNT
-    private var input = Input()
+    private var inputs: [Input] = [Input()]
 
     private var timer: Timer?
     private var mouseLocation: NSPoint { NSEvent.mouseLocation }
@@ -64,7 +64,12 @@ final class AutoClickSimulator: ObservableObject {
         } else {
             self.interval = Defaults[.autoClickerState].pressInterval
         }
-        self.input = Defaults[.autoClickerState].pressInput
+        self.inputs = Defaults[.autoClickerState].pressInputs.filter { !$0.readable.isEmpty }
+
+        if self.inputs.isEmpty {
+            self.inputs = [Input()]
+        }
+
         self.amountOfPresses = Defaults[.autoClickerState].pressAmount
         self.remainingInterations = Defaults[.autoClickerState].repeatAmount
 
@@ -244,15 +249,15 @@ final class AutoClickSimulator: ObservableObject {
         .otherMouseUp: .center
     ]
 
-    private func generateMouseClickEvents(source: CGEventSource?) -> [CGEvent?] {
+    private func generateMouseClickEvents(source: CGEventSource?, input: Input) -> [CGEvent?] {
         let mouseX = self.mouseLocation.x
         let mouseY = NSScreen.screens[0].frame.height - mouseLocation.y
 
         let clickingAtPoint = CGPoint(x: mouseX, y: mouseY)
 
-        let mouseDownType: CGEventType = mouseDownEventMap[self.input.type]!
-        let mouseUpType: CGEventType = mouseUpEventMap[self.input.type]!
-        let mouseButton: CGMouseButton = mouseButtonEventMap[self.input.type]!
+        let mouseDownType: CGEventType = mouseDownEventMap[input.type]!
+        let mouseUpType: CGEventType = mouseUpEventMap[input.type]!
+        let mouseButton: CGMouseButton = mouseButtonEventMap[input.type]!
 
         let mouseDown = CGEvent(mouseEventSource: source,
                                 mouseType: mouseDownType,
@@ -267,31 +272,31 @@ final class AutoClickSimulator: ObservableObject {
         return [mouseDown, mouseUp]
     }
 
-    private func generateKeyPressEvents(source: CGEventSource?) -> [CGEvent?] {
+    private func generateKeyPressEvents(source: CGEventSource?, input: Input) -> [CGEvent?] {
         let keyDown = CGEvent(keyboardEventSource: source,
-                              virtualKey: CGKeyCode(self.input.keyCode),
+                              virtualKey: CGKeyCode(input.keyCode),
                               keyDown: true)
 
         let keyUp = CGEvent(keyboardEventSource: source,
-                            virtualKey: CGKeyCode(self.input.keyCode),
+                            virtualKey: CGKeyCode(input.keyCode),
                             keyDown: false)
 
-        if self.input.modifiers.contains(.command) {
+        if input.modifiers.contains(.command) {
             keyDown?.flags = CGEventFlags.maskCommand
             keyUp?.flags = CGEventFlags.maskCommand
         }
 
-        if self.input.modifiers.contains(.control) {
+        if input.modifiers.contains(.control) {
             keyDown?.flags = CGEventFlags.maskControl
             keyUp?.flags = CGEventFlags.maskControl
         }
 
-        if self.input.modifiers.contains(.option) {
+        if input.modifiers.contains(.option) {
             keyDown?.flags = CGEventFlags.maskAlternate
             keyUp?.flags = CGEventFlags.maskAlternate
         }
 
-        if self.input.modifiers.contains(.shift) {
+        if input.modifiers.contains(.shift) {
             keyDown?.flags = CGEventFlags.maskShift
             keyUp?.flags = CGEventFlags.maskShift
         }
@@ -302,17 +307,24 @@ final class AutoClickSimulator: ObservableObject {
     private func press() {
         let source: CGEventSource? = CGEventSource(stateID: .hidSystemState)
 
-        let pressEvents = self.input.isMouseInput
-                            ? generateMouseClickEvents(source: source)
-                            : generateKeyPressEvents(source: source)
-
         var completedPressesThisAction = 0
 
         while completedPressesThisAction < self.amountOfPresses {
-            for event in pressEvents {
-                event!.post(tap: .cghidEventTap)
+            for (index, input) in self.inputs.enumerated() {
+                let pressEvents = input.isMouseInput
+                                    ? generateMouseClickEvents(source: source, input: input)
+                                    : generateKeyPressEvents(source: source, input: input)
 
-                LoggerService.simPress(input: self.input, location: event!.location)
+                for event in pressEvents {
+                    event!.post(tap: .cghidEventTap)
+
+                    LoggerService.simPress(input: input, location: event!.location)
+                }
+
+                // Space out multiple inputs within a single press cycle so each one lands
+                if index < self.inputs.count - 1 {
+                    usleep(UInt32(PRESS_INPUT_INTERVAL) * 1000)
+                }
             }
 
             completedPressesThisAction += 1

@@ -47,6 +47,9 @@
 "key_listener_modal_dismiss_key_prompt"   = "Hold the escape key when done.";
 "key_listener_modal_dismiss_key_override" = "To use the escape key itself, press it twice.";
 
+"press_input_add"    = "+";
+"press_input_remove" = "-";
+
 "settings_general"            = "General";
 "settings_shortcuts"          = "Shortcuts";
 "settings_window"             = "Window";

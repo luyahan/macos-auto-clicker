@@ -13,13 +13,14 @@ struct PressKeyListenerModal: View {
     @Environment(\.presentationMode) private var presentationMode
 
     @Default(.appearanceSelectedTheme) private var activeTheme
-    @Default(.autoClickerState) private var formState
+
+    @Binding var input: Input
 
     @State private var escapeKeyStreak: Int = 0
 
     func handleInputEvent(input: Input) {
         guard !input.isMouseInput else {
-            self.formState.pressInput = input
+            self.input = input
 
             return
         }
@@ -36,7 +37,7 @@ struct PressKeyListenerModal: View {
         }
 
         if (input.keyCode != kVK_Escape || (input.keyCode == kVK_Escape && self.escapeKeyStreak > 1)) && !input.readable.isEmpty {
-            self.formState.pressInput = input
+            self.input = input
 
             self.escapeKeyStreak = 0
         }
@@ -48,7 +49,7 @@ struct PressKeyListenerModal: View {
 
             Spacer()
 
-            Text(self.formState.pressInput.readable)
+            Text(self.input.readable)
 
             Spacer()
 

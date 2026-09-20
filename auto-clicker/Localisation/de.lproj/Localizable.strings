@@ -40,6 +40,9 @@
 "key_listener_modal_dismiss_key_prompt" = "Halte die Escape-Taste, wenn du fertig bist.";
 "key_listener_modal_dismiss_key_override" = "Um die Escape-Taste selbst zu verwenden, drücke sie zweimal.";
 
+"press_input_add"    = "+";
+"press_input_remove" = "-";
+
 "settings_general" = "Allgemein";
 "settings_shortcuts" = "Tastenkürzel";
 "settings_window" = "Fenster";

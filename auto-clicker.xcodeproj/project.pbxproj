@@ -30,6 +30,7 @@
 		B510763227FF7EC800BB1CDA /* InputAwareView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510763127FF7EC800BB1CDA /* InputAwareView.swift */; };
 		B510763527FF811B00BB1CDA /* PressKeyListenerModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510763427FF811B00BB1CDA /* PressKeyListenerModal.swift */; };
 		B510763727FF81A000BB1CDA /* PressKeyListener.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510763627FF81A000BB1CDA /* PressKeyListener.swift */; };
+		B510763927FF82C000BB1CDA /* PressInputSlotRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510763827FF82B000BB1CDA /* PressInputSlotRow.swift */; };
 		B510763B2800DDFF00BB1CDA /* NSEvent+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510763A2800DDFF00BB1CDA /* NSEvent+Extensions.swift */; };
 		B5107640280113DB00BB1CDA /* Input.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510763F280113DB00BB1CDA /* Input.swift */; };
 		B53027F5264C0D73002B8610 /* AutoClickSimulator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53027F4264C0D73002B8610 /* AutoClickSimulator.swift */; };
@@ -100,6 +101,7 @@
 		B510763127FF7EC800BB1CDA /* InputAwareView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputAwareView.swift; sourceTree = "<group>"; };
 		B510763427FF811B00BB1CDA /* PressKeyListenerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressKeyListenerModal.swift; sourceTree = "<group>"; };
 		B510763627FF81A000BB1CDA /* PressKeyListener.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressKeyListener.swift; sourceTree = "<group>"; };
+		B510763827FF82B000BB1CDA /* PressInputSlotRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PressInputSlotRow.swift; sourceTree = "<group>"; };
 		B510763A2800DDFF00BB1CDA /* NSEvent+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSEvent+Extensions.swift"; sourceTree = "<group>"; };
 		B510763F280113DB00BB1CDA /* Input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Input.swift; sourceTree = "<group>"; };
 		B53027F4264C0D73002B8610 /* AutoClickSimulator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoClickSimulator.swift; sourceTree = "<group>"; };
@@ -341,6 +343,7 @@
 				B5E92B0D27F1036B00A7FC63 /* DurationModal.swift */,
 				B510763627FF81A000BB1CDA /* PressKeyListener.swift */,
 				B510763427FF811B00BB1CDA /* PressKeyListenerModal.swift */,
+				B510763827FF82B000BB1CDA /* PressInputSlotRow.swift */,
 				B5F6A01A27F3A8A6003CD730 /* StatBox.swift */,
 				B510761E27F4B6F500BB1CDA /* KeyboardShortcutHint.swift */,
 				B5BCE808287C2F4D00B739AD /* SmallText.swift */,
@@ -589,6 +592,7 @@
 				B5F6A01627F3900E003CD730 /* Color+Extensions.swift in Sources */,
 				B5E92B2927F35DB800A7FC63 /* DynamicWidthNumberField.swift in Sources */,
 				B510763727FF81A000BB1CDA /* PressKeyListener.swift in Sources */,
+				B510763927FF82C000BB1CDA /* PressInputSlotRow.swift in Sources */,
 				B5F6A01927F3970A003CD730 /* ThemeColour.swift in Sources */,
 				B53027F5264C0D73002B8610 /* AutoClickSimulator.swift in Sources */,
 				B5D603EF2883027D00655D2C /* SettingsTabView.swift in Sources */,

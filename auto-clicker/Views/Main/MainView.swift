@@ -108,7 +108,7 @@ struct MainView: View {
                     Text("main_window_comma", comment: "Main window comma")
                 }
 
-                ActionStageLine {
+                ActionStageLine(content: {
                     Text("main_window_press", comment: "Main window 'press'")
 
                     PressKeyListener()
@@ -121,7 +121,10 @@ struct MainView: View {
                         .disabled(self.hasStarted)
 
                     Text(self.formState.pressAmount == 1 ? "main_window_time" : "main_window_times", comment: "Main window 'time(s)'") + Text("main_window_comma", comment: "Main window comma")
-                }
+                }, trailing: AnyView(
+                    PressInputCountControls()
+                        .foregroundColor(self.activeTheme.fontColour)
+                ))
 
                 ActionStageLine {
                     Text("main_window_repeat", comment: "Main window 'repeat'")

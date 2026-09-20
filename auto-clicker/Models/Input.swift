@@ -8,7 +8,7 @@
 import SwiftUI
 import Defaults
 
-struct Input: Codable, Defaults.Serializable {
+struct Input: Codable, Defaults.Serializable, Hashable {
     var readable: String
     var type: NSEvent.EventType
     var keyCode: UInt16

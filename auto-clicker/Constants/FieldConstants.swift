@@ -25,6 +25,16 @@ let MAX_PRESS_AMOUNT: Int = 100_000_000
 
 let DEFAULT_PRESS_AMOUNT: Int = 1
 
+// MARK: - Press Inputs
+
+let MIN_PRESS_INPUTS: Int = 1
+let MAX_PRESS_INPUTS: Int = 5
+
+let DEFAULT_PRESS_INPUTS: Int = 1
+
+// Delay between each input within a single press cycle, in milliseconds
+let PRESS_INPUT_INTERVAL: Int = 100
+
 // MARK: - Amount of times to repeat all actions
 
 let MIN_REPEAT_AMOUNT: Int = 1

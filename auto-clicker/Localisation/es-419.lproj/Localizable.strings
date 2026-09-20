@@ -40,6 +40,9 @@
 "key_listener_modal_dismiss_key_prompt"   = "Mantén presionada la tecla escape cuando termines.";
 "key_listener_modal_dismiss_key_override" = "Para usar la tecla escape, presiónala dos veces.";
 
+"press_input_add"    = "+";
+"press_input_remove" = "-";
+
 "settings_general"            = "General";
 "settings_shortcuts"          = "Atajos";
 "settings_window"             = "Ventana";
