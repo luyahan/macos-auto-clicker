@@ -31,6 +31,9 @@ struct ACWindow: View {
         //  also applies while the permissions screen is showing — otherwise the window would keep
         //  the stock title bar (and its extra height) until permissions were granted.
         .background(TPWindowConfigurator())
+        // The window is pinned to the design's 420x620, so the drawn green light has nothing to
+        //  zoom to and is shown as unavailable.
+        .environment(\.isWindowActionAvailable, WindowActionAvailability.fixedSize)
         .onAppear {
             self.permissionsService.pollAccessibilityPrivileges(onTrusted: {
                 MenuBarService.enableAllMenuBarItems()

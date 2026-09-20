@@ -78,12 +78,19 @@ struct TPTitleBar: View {
 /// Nodes 2:311–2:313 — 11pt circles with 8pt gaps. The design's own lights are drawn here and
 ///  wired to the real window, because `TPWindowConfigurator` hides AppKit's buttons to stop two
 ///  sets of them appearing on top of each other.
+///
+/// Actions are performed through `WindowHandle`, never through AppKit's `perform…` methods, which
+///  all no-op on a window that has lost `.titled`.
 struct TrafficLights: View {
     @State private var isHovering = false
 
     /// Defaults to driving the hosting window. `MacroSettingsPanel` overrides it so its lights
     ///  affect the sheet instead of the window underneath.
     @Environment(\.performWindowAction) private var performWindowAction
+
+    /// Lets a fixed-size window show its green light as unavailable rather than wiring up an action
+    ///  that would do nothing.
+    @Environment(\.isWindowActionAvailable) private var isWindowActionAvailable
 
     var body: some View {
         HStack(spacing: TPMetrics.trafficLightSpacing) {
@@ -100,16 +107,20 @@ struct TrafficLights: View {
     }
 
     private func light(_ colour: Color, label: String, action: WindowAction) -> some View {
-        Button {
+        let isAvailable = self.isWindowActionAvailable(action)
+
+        return Button {
             self.performWindowAction(action)
         } label: {
             ZStack {
                 Circle()
-                    .fill(colour)
+                    // A fixed-size window has no zoom state, so its light is dimmed to match the
+                    //  greyed-out green button a stock macOS window shows in the same situation.
+                    .fill(isAvailable ? colour : colour.opacity(0.3))
 
                 // The design draws flat circles, so the symbols only appear on hover. Without
                 //  them the drawn lights would be unusable for anyone unfamiliar with the app.
-                if self.isHovering {
+                if self.isHovering && isAvailable {
                     Image(systemName: self.symbol(for: action))
                         .font(.system(size: 5.5, weight: .bold))
                         .foregroundColor(.black.opacity(0.55))
@@ -118,6 +129,7 @@ struct TrafficLights: View {
             .frame(width: TPMetrics.trafficLightSize, height: TPMetrics.trafficLightSize)
         }
         .buttonStyle(.plain)
+        .disabled(!isAvailable)
         .accessibilityLabel(Text(label))
     }
 

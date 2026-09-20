@@ -11,6 +11,10 @@
 //  closed or moved. `TrafficLights` therefore always performs the real action regardless of
 //  whether this configurator has run.
 //
+//  The actions it performs must not be the `perform…` family: those all consult the style mask
+//  first and quietly do nothing once `.titled` has been dropped, which is what made every light
+//  inert. See `WindowHandle.perform(_:)`.
+//
 
 import AppKit
 import ObjectiveC
@@ -158,7 +162,7 @@ struct WindowChrome {
         //
         // Nothing is lost by dropping it: both windows draw their own title bar and traffic lights,
         //  and this configurator hides AppKit's. `WindowDragArea` supplies the dragging and
-        //  `WindowHandle` receives key events, so the borderless windows still behave normally.
+        //  `WindowKeyability` puts key events back, so the borderless windows still behave normally.
         window.styleMask.remove(.titled)
 
         // Restores what `.titled` used to provide implicitly. Without it the window can no longer
@@ -240,8 +244,18 @@ struct TPWindowConfigurator: NSViewRepresentable {
     }
 }
 
+/// How a window narrows the actions its `TrafficLights` cluster offers.
+enum WindowActionAvailability {
+    /// The window is pinned to its design size, so its green light has nothing to zoom to.
+    ///  Applied by `ACWindow` alongside `TPWindowConfigurator`.
+    static let fixedSize: (WindowAction) -> Bool = { $0 != .zoom }
+}
+
 /// Reports the window's backing `NSWindow` so `TrafficLights` can drive it.
-final class WindowHandle: ObservableObject {
+///
+/// Not an `ObservableObject`: the window is captured once and never read during a view update, so
+///  there is no published state for a view to re-render on.
+final class WindowHandle {
     static let shared = WindowHandle()
 
     weak var window: NSWindow?
@@ -254,9 +268,38 @@ final class WindowHandle: ObservableObject {
         }
 
         switch action {
-        case .close: window.performClose(nil)
-        case .miniaturise: window.performMiniaturize(nil)
-        case .zoom: window.performZoom(nil)
+        case .close:
+            self.close(window)
+
+        case .miniaturise:
+            // `miniaturize(nil)` rather than `performMiniaturize(nil)`: the latter checks the style
+            //  mask, finds no `.miniaturizable` once `.titled` is gone, and returns without doing
+            //  anything. This call has no such check.
+            window.miniaturize(nil)
+
+        case .zoom:
+            // Same reason as above: `performZoom(nil)` consults the style mask, `zoom(nil)` does
+            //  not.
+            window.zoom(nil)
+        }
+    }
+
+    /// Closes the window the way the red light is expected to.
+    ///
+    /// `performClose(nil)` is a no-op here: it refuses to close unless the style mask still holds
+    ///  `.closable`, and removing `.titled` takes that with it. `close()` has no such check, but it
+    ///  also bypasses the delegate — and the delegate is where "close means hide" lives — so the
+    ///  delegate is consulted by hand first.
+    private func close(_ window: NSWindow) {
+        // `nil` means the window has no delegate, or has one that does not answer.
+        let delegateWantsToClose = window.delegate?.windowShouldClose?(window)
+
+        if delegateWantsToClose ?? WindowStateService.shouldExitOnClose() {
+            window.close()
+        } else if delegateWantsToClose == nil {
+            // The delegate refused the close and already handled it. When there was no answer to
+            //  refuse, the same hide-instead-of-quit fallback has to be applied here.
+            NSApp.hide(nil)
         }
     }
 }
@@ -281,6 +324,22 @@ extension EnvironmentValues {
     var performWindowAction: (WindowAction) -> Void {
         get { self[WindowActionKey.self] }
         set { self[WindowActionKey.self] = newValue }
+    }
+}
+
+/// Whether an action can do anything for the window a `TrafficLights` cluster belongs to.
+///
+/// Every action is available by default. A window that cannot honour one narrows it with
+///  `WindowActionAvailability`. Drawing a control that silently does nothing is worse than one that
+///  reads as unavailable, so the cluster asks before it wires the action up.
+private struct WindowActionAvailabilityKey: EnvironmentKey {
+    static let defaultValue: (WindowAction) -> Bool = { _ in true }
+}
+
+extension EnvironmentValues {
+    var isWindowActionAvailable: (WindowAction) -> Bool {
+        get { self[WindowActionAvailabilityKey.self] }
+        set { self[WindowActionAvailabilityKey.self] = newValue }
     }
 }
 
