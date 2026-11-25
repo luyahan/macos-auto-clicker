@@ -112,3 +112,60 @@ extension FormState {
         try container.encode(self.repeatAmount, forKey: .repeatAmount)
     }
 }
+
+extension FormState {
+    /// Bounds used when a stored or migrated configuration is turned into a run.
+    ///
+    /// These are deliberately generous enough for normal use but finite, so arithmetic in the
+    /// simulator cannot overflow and a malformed preferences file cannot request an endless run.
+    static let maxInputs = 32
+    static let maxPressAmount = 1_000
+    static let maxRepeatAmount = 9_999
+    static let maxIntervalMilliseconds = 86_400_000
+    static let maxStartDelaySeconds = 86_400
+    static let maxInputIntervalMilliseconds = 10_000
+    static let maxHoldIntervalMilliseconds = 60_000
+
+    func validatedForExecution() -> FormState {
+        var result = self
+
+        func clamped(_ value: Int, _ lower: Int, _ upper: Int) -> Int {
+            min(max(value, lower), upper)
+        }
+
+        result.pressInterval = clamped(
+            self.pressInterval, 1, Self.maxIntervalMilliseconds
+        )
+
+        var lower = clamped(
+            self.pressIntervalMin ?? DEFAULT_PRESS_INTERVAL_MIN, 1, Self.maxIntervalMilliseconds
+        )
+        var upper = clamped(
+            self.pressIntervalMax ?? DEFAULT_PRESS_INTERVAL_MAX, 1, Self.maxIntervalMilliseconds
+        )
+        if lower > upper {
+            swap(&lower, &upper)
+        }
+        result.pressIntervalMin = lower
+        result.pressIntervalMax = upper
+
+        result.pressAmount = clamped(self.pressAmount, 1, Self.maxPressAmount)
+        result.repeatAmount = clamped(self.repeatAmount, 1, Self.maxRepeatAmount)
+        result.startDelay = clamped(self.startDelay, 0, Self.maxStartDelaySeconds)
+        result.pressInputInterval = clamped(
+            self.pressInputInterval ?? PRESS_INPUT_INTERVAL, 0, Self.maxInputIntervalMilliseconds
+        )
+
+        if let hold = self.holdInterval {
+            result.holdInterval = clamped(hold, 0, Self.maxHoldIntervalMilliseconds)
+        }
+
+        result.pressInputs = Array(
+            self.pressInputs
+                .filter { $0.isValidForExecution }
+                .prefix(Self.maxInputs)
+        )
+
+        return result
+    }
+}

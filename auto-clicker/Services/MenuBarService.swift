@@ -122,6 +122,18 @@ final class MenuBarService {
     }
 
     static func destroy() {
+        // Releasing only the Swift reference does not remove the item from the system bar.
+        if let bar = self.statusBar, let item = self.statusBarItem {
+            bar.removeStatusItem(item)
+        }
+
+        self.startMenuItem = nil
+        self.stopMenuItem = nil
+        self.hideOrShowMenuItem = nil
+        self.preferencesMenuItem = nil
+        self.aboutMenuItem = nil
+        self.quitMenuItem = nil
+
         self.statusBar = nil
         self.statusBarItem = nil
         self.statusBarPopover = nil

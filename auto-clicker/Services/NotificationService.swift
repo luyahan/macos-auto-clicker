@@ -9,7 +9,10 @@ import Foundation
 import UserNotifications
 
 final class NotificationService: ObservableObject {
-    static func scheduleNotification(title: String, body: String? = nil, date: Date) {
+    static func scheduleNotification(title: String,
+                                     body: String? = nil,
+                                     date: Date,
+                                     identifier: String? = nil) {
         let content = UNMutableNotificationContent()
         content.title = title
         content.sound = UNNotificationSound.default
@@ -27,14 +30,24 @@ final class NotificationService: ObservableObject {
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: interval,
                                                         repeats: false)
 
-        let request = UNNotificationRequest(identifier: UUID().uuidString,
+        let request = UNNotificationRequest(identifier: identifier ?? UUID().uuidString,
                                             content: content,
                                             trigger: trigger)
 
-        UNUserNotificationCenter.current().add(request)
+        UNUserNotificationCenter.current().add(request) { error in
+            if let error {
+                LoggerService.logNotificationError(error)
+            }
+        }
     }
 
     static func removePendingNotifications() {
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
+    }
+
+    /// Removes only the notifications belonging to one run.
+    static func removePendingNotifications(identifiers: [String]) {
+        guard !identifiers.isEmpty else { return }
+        UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: identifiers)
     }
 }

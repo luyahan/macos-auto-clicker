@@ -1,5 +1,11 @@
 default_platform(:mac)
 
+# Notarization credentials are supplied by CI secrets / local keychain, never committed.
+def require_notarization_credentials!
+  missing = %w[APPLE_ID APPLE_APP_PASSWORD APPLE_TEAM_ID].reject { |key| ENV[key] && !ENV[key].empty? }
+  UI.user_error!("Missing notarization secrets: #{missing.join(', ')}") unless missing.empty?
+end
+
 # https://docs.fastlane.tools/actions/build_mac_app/#automating-the-whole-process
 platform :mac do
   lane :local do
@@ -69,6 +75,28 @@ def build_and_zip(tag_prefix, is_beta, is_local)
     export_method: "mac-application"
   )
 
+  # Distributing outside the Mac App Store requires Developer ID signing and notarization.
+  # Release builds use "Developer ID Application" (see project.pbxproj); staple the ticket
+  # before zipping so the download can be verified by Gatekeeper without a network fetch.
+  unless is_local
+    require_notarization_credentials!
+
+    app_path = "build/AutoClicker.app"
+
+    notarize(
+      app_path: app_path,
+      username: ENV["APPLE_ID"],
+      password: ENV["APPLE_APP_PASSWORD"],
+      team_id: ENV["APPLE_TEAM_ID"],
+      asc_provider: ENV["APPLE_TEAM_ID"]
+    )
+
+    staple(app_path: app_path)
+
+    verified = sh("codesign", "--verify", "--deep", "--strict", app_path)
+    UI.message("codesign verification: #{verified}")
+  end
+
   unless is_beta or is_local
     # https://github.com/jonathanneilritchie/fastlane-plugin-find_replace_string
     find_replace_string(
@@ -124,6 +152,11 @@ def build_and_zip(tag_prefix, is_beta, is_local)
     verbose: true
   )
 
+  # Publish a checksum so users can verify the download was not replaced in transit.
+  checksum_path = "build/AutoClicker.zip.sha256"
+  checksum = sh("shasum", "-a", "256", output_archive_path, log: false).strip
+  File.write(checksum_path, "#{checksum}  AutoClicker.zip\n")
+
   # https://docs.fastlane.tools/actions/set_github_release/#set_github_release
   unless is_local
     set_github_release(
@@ -136,6 +169,7 @@ def build_and_zip(tag_prefix, is_beta, is_local)
       commitish: "main",
       upload_assets: [
         output_archive_path,
+        checksum_path,
         "build/AutoClicker.app.dSYM.zip"
       ]
     )

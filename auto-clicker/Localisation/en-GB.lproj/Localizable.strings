@@ -172,6 +172,11 @@
 "macro_field_name"            = "宏名称";
 "macro_field_combo"           = "按键组合";
 "macro_field_mode"            = "触发方式";
+"macro_field_scope"           = "生效范围";
+"macro_scope_global"          = "全局生效";
+"macro_scope_application"     = "指定应用";
+"macro_scope_select_application" = "选择正在运行的应用";
+"macro_scope_application_hint" = "仅目标应用位于前台时执行；切换应用会暂停，切回后继续";
 
 "macro_options_header"        = "可选选项";
 "macro_option_repeat"         = "重复次数";
@@ -198,4 +203,7 @@
 "macro_error_none_armed"      = "未启用任何宏，请先点击左侧圆圈启用一个宏";
 "macro_error_no_key"          = "该宏只有修饰键，没有可触发的按键";
 "macro_error_simultaneous_multi_key" = "「同时按下」只能有一个普通按键，多余的按键不会被触发";
+"macro_error_target_missing"  = "请先为该宏选择目标应用";
 "macro_started_title"         = "已启动：%@";
+"macro_error_no_permission"   = "请先在系统设置中授予辅助功能权限";
+"macro_error_long_press_multi_key" = "「长按」只能有一个按键，多余的按键不会被触发";

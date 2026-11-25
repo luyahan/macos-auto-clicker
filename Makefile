@@ -4,10 +4,11 @@ setup:
 
 # https://docs.fastlane.tools/getting-started/ios/setup/#use-a-gemfile
 # https://docs.fastlane.tools/plugins/using-plugins/
-# This may not work due to permissions, so use `$ fastlane update` which calls `brew` under the hood
+# Keep dependency updates inside the user's Bundler environment. Never use sudo here:
+# dependency scripts would otherwise run with root privileges.
 .PHONY: update
 update:
-	sudo bundle update fastlane
+	bundle update fastlane
 	bundle exec fastlane update_plugins
 
 .PHONY: local

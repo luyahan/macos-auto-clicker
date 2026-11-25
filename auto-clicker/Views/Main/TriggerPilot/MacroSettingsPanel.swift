@@ -57,6 +57,7 @@ struct MacroSettingsPanel: View {
                     self.nameField
                     self.comboSection
                     self.modeSection
+                    self.scopeSection
 
                     Color.clear.frame(height: 17)
 
@@ -350,6 +351,94 @@ struct MacroSettingsPanel: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    // MARK: - Execution scope
+
+    private var scopeSection: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            self.fieldLabel("macro_field_scope", comment: "Execution scope field label")
+
+            HStack(spacing: 4) {
+                ForEach(MacroExecutionScope.allCases) { scope in
+                    let isOn = scope == self.draft.executionScope
+
+                    Button {
+                        self.draft.executionScope = scope
+                    } label: {
+                        Text(LocalizedStringKey(scope.localised))
+                            .font(TPType.text(11.5, weight: isOn ? .medium : .regular))
+                            .foregroundColor(isOn ? .white : TPPalette.textSoft)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: TPMetrics.segmentHeight)
+                            .triggerPilotSurface(
+                                fill: isOn ? TPPalette.accent : .clear,
+                                cornerRadius: TPMetrics.stepperCornerRadius
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(3)
+            .frame(height: 36)
+            .triggerPilotSurface(
+                fill: Color.black.opacity(0.28),
+                cornerRadius: TPMetrics.optionRowCornerRadius
+            )
+
+            if self.draft.executionScope == .application {
+                Menu {
+                    ForEach(self.runningApplications, id: \.bundleIdentifier) { application in
+                        Button(application.localizedName ?? application.bundleIdentifier ?? "") {
+                            self.draft.targetBundleIdentifier = application.bundleIdentifier
+                            self.draft.targetApplicationName = application.localizedName
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 8) {
+                        Text(self.draft.targetApplicationName
+                             ?? NSLocalizedString("macro_scope_select_application", comment: "Select target application"))
+                            .font(TPType.text(11.5))
+                            .foregroundColor(self.draft.targetBundleIdentifier == nil
+                                             ? TPPalette.warning
+                                             : TPPalette.textPrimary)
+                            .lineLimit(1)
+
+                        Spacer(minLength: 0)
+
+                        Text("▾")
+                            .font(TPType.text(11, weight: .medium))
+                            .foregroundColor(TPPalette.textCool)
+                    }
+                    .padding(.horizontal, 11)
+                    .frame(height: 34)
+                    .triggerPilotSurface(
+                        fill: TPPalette.surface,
+                        cornerRadius: TPMetrics.fieldCornerRadius,
+                        stroke: Color.white.opacity(0.12)
+                    )
+                }
+                .menuStyle(.borderlessButton)
+
+                Text("macro_scope_application_hint", comment: "Application scope behavior hint")
+                    .font(TPType.text(10.5))
+                    .foregroundColor(TPPalette.accentMauve)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var runningApplications: [NSRunningApplication] {
+        NSWorkspace.shared.runningApplications
+            .filter { application in
+                application.activationPolicy == .regular
+                    && application.bundleIdentifier != Bundle.main.bundleIdentifier
+                    && application.bundleIdentifier != nil
+            }
+            .sorted {
+                ($0.localizedName ?? $0.bundleIdentifier ?? "")
+                    .localizedCaseInsensitiveCompare($1.localizedName ?? $1.bundleIdentifier ?? "") == .orderedAscending
+            }
+    }
+
     // MARK: - Options section (6:2)
 
     /// One of the panel's option rows: an icon, a label, a spacer and the control, all sharing the
@@ -609,7 +698,9 @@ struct MacroSettingsPanel: View {
     ///  then refused at run time. Mouse caps count as the key of the chord, which is what makes a
     ///  recorded Cmd+click representable. Modifiers are never dropped — they are the chord's flags.
     private func pruneCapsForMode() {
-        guard self.draft.mode == .simultaneous else {
+        // Both chord modes deliver exactly one non-modifier cap. Long press used to keep the
+        // surplus keys in the UI and silently play only the first one.
+        guard self.draft.mode == .simultaneous || self.draft.mode == .longPress else {
             return
         }
 

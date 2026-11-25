@@ -27,6 +27,20 @@ enum TriggerMode: String, Codable, CaseIterable, Identifiable, Defaults.Serializ
     }
 }
 
+enum MacroExecutionScope: String, Codable, CaseIterable, Identifiable, Defaults.Serializable {
+    case global
+    case application
+
+    var id: String { self.rawValue }
+
+    var localised: String {
+        switch self {
+        case .global: return "macro_scope_global"
+        case .application: return "macro_scope_application"
+        }
+    }
+}
+
 /// A single key cap in a macro's combination, e.g. `CMD`, `S` or a mouse button.
 struct KeyCap: Codable, Hashable, Defaults.Serializable {
     var label: String
@@ -168,9 +182,14 @@ struct Macro: Codable, Identifiable, Hashable, Defaults.Serializable {
     ///  fixed 1ms tick, which made the rounds run back to back with no way to slow them down.
     var roundIntervalMilliseconds: Int
 
+    var executionScope: MacroExecutionScope
+    var targetBundleIdentifier: String?
+    var targetApplicationName: String?
+
     private enum CodingKeys: String, CodingKey {
         case id, name, caps, mode, repeatCount, delayEnabled, delaySeconds, intervalMilliseconds
         case roundIntervalMilliseconds
+        case executionScope, targetBundleIdentifier, targetApplicationName
     }
 }
 
@@ -184,7 +203,8 @@ extension Macro {
 
     init(name: String, caps: [KeyCap], mode: TriggerMode, repeatCount: Int = 1,
          delayEnabled: Bool = false, delaySeconds: Double = 1.5, intervalMilliseconds: Int = 300,
-         roundIntervalMilliseconds: Int = 300) {
+            roundIntervalMilliseconds: Int = 300, executionScope: MacroExecutionScope = .global,
+            targetBundleIdentifier: String? = nil, targetApplicationName: String? = nil) {
         self.id = UUID()
         self.name = name
         self.caps = caps
@@ -194,6 +214,9 @@ extension Macro {
         self.delaySeconds = delaySeconds
         self.intervalMilliseconds = intervalMilliseconds
         self.roundIntervalMilliseconds = roundIntervalMilliseconds
+        self.executionScope = executionScope
+        self.targetBundleIdentifier = targetBundleIdentifier
+        self.targetApplicationName = targetApplicationName
     }
 }
 
@@ -212,6 +235,9 @@ extension Macro {
         self.delaySeconds = try container.decodeIfPresent(Double.self, forKey: .delaySeconds) ?? 1.5
         self.intervalMilliseconds = try container.decodeIfPresent(Int.self, forKey: .intervalMilliseconds) ?? 300
         self.roundIntervalMilliseconds = try container.decodeIfPresent(Int.self, forKey: .roundIntervalMilliseconds) ?? 300
+        self.executionScope = try container.decodeIfPresent(MacroExecutionScope.self, forKey: .executionScope) ?? .global
+        self.targetBundleIdentifier = try container.decodeIfPresent(String.self, forKey: .targetBundleIdentifier)
+        self.targetApplicationName = try container.decodeIfPresent(String.self, forKey: .targetApplicationName)
     }
 
     /// The `"4 键"` badge shown at the trailing edge of a macro row.
@@ -268,18 +294,51 @@ extension Macro {
     /// Why the macro cannot be run as configured, or `nil` when it can.
     ///
     /// A combination is stored as one cap per key, and each mode can only deliver certain shapes.
-    ///  Checking here rather than silently dropping the surplus is what stops a macro that the
-    ///  panel accepts from doing something other than what its name describes.
+    /// Checking here rather than silently dropping the surplus is what stops a macro that the
+    /// panel accepts from doing something other than what its name describes.
     var unsupportedReason: String? {
         switch self.mode {
         case .simultaneous:
-            // A chord presses one key with the modifiers held, so it can only carry one key.
-            return self.plainKeys.count > 1 ? "macro_error_simultaneous_multi_key" : nil
+            // A chord delivers exactly one non-modifier cap (key or mouse button) plus modifiers.
+            let deliverable = self.caps.filter { !$0.isModifier }
+            if deliverable.isEmpty {
+                return "macro_error_no_key"
+            }
+            return deliverable.count > 1 ? "macro_error_simultaneous_multi_key" : nil
         case .sequential:
             return self.caps.isEmpty ? "macro_error_no_key" : nil
         case .longPress:
-            return self.caps.isEmpty ? "macro_error_no_key" : nil
+            // Holding a chord has the same single-event constraint as a simultaneous chord.
+            let deliverable = self.caps.filter { !$0.isModifier }
+            if deliverable.isEmpty {
+                return "macro_error_no_key"
+            }
+            return deliverable.count > 1 ? "macro_error_long_press_multi_key" : nil
         }
+    }
+
+    /// Returns a macro whose persisted values are safe to execute.
+    ///
+    /// `Codable` decoding only supplies defaults; it does not clamp ranges. A hand-edited or
+    /// migrated preferences file can therefore contain values that would overflow the simulator's
+    /// arithmetic or produce an invalid `Int.random(in:)` range. Clamp here, before execution.
+    func validatedForExecution() -> Macro {
+        var result = self
+
+        result.repeatCount = min(max(self.repeatCount, Self.minRepeatCount), Self.maxRepeatCount)
+        result.delaySeconds = self.delaySeconds.isFinite
+            ? min(max(self.delaySeconds, 0), 86_400)
+            : 0
+        result.intervalMilliseconds = min(max(self.intervalMilliseconds, 1), 10_000)
+        result.roundIntervalMilliseconds = min(max(self.roundIntervalMilliseconds, 1), 600_000)
+        result.caps = Array(self.caps.prefix(Self.maxCaps))
+
+        if result.executionScope == .application {
+            let trimmed = result.targetBundleIdentifier?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+            result.targetBundleIdentifier = trimmed.isEmpty ? nil : trimmed
+        }
+
+        return result
     }
 
     /// The macro expressed in the terms `AutoClickSimulator` already understands.

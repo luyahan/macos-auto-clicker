@@ -28,9 +28,10 @@ jobs:
 
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       # - name: SwiftLint
       #   uses: norio-nomura/action-swiftlint@3.2.1
@@ -41,6 +42,6 @@ jobs:
       #  placed onto the main PR page.
 
       - name: SwiftLint (Strict)
-        uses: norio-nomura/action-swiftlint@3.2.1
+        uses: norio-nomura/action-swiftlint@b3fcfb2c5a82d46c48495dda0bcb4c0e981bfc54 # 3.2.1
         with:
           args: --strict

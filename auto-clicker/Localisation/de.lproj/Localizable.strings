@@ -158,6 +158,11 @@
 "macro_field_name"            = "Makroname";
 "macro_field_combo"           = "Tastenkombination";
 "macro_field_mode"            = "Ausloesemodus";
+"macro_field_scope"           = "Geltungsbereich";
+"macro_scope_global"          = "Global";
+"macro_scope_application"     = "Bestimmte App";
+"macro_scope_select_application" = "Laufende App auswaehlen";
+"macro_scope_application_hint" = "Laeuft nur, wenn die Ziel-App aktiv ist; sonst pausiert das Makro";
 
 "macro_options_header"        = "Optionale Einstellungen";
 "macro_option_repeat"         = "Wiederholungen";
@@ -184,4 +189,7 @@
 "macro_error_none_armed"      = "Kein Makro aktiv, bitte zuerst links einen Kreis anklicken";
 "macro_error_no_key"          = "Dieses Makro hat nur Modifikatortasten";
 "macro_error_simultaneous_multi_key" = "\"Gleichzeitig\" erlaubt nur eine normale Taste, weitere werden ignoriert";
+"macro_error_target_missing"  = "Bitte zuerst eine Ziel-App auswaehlen";
 "macro_started_title"         = "Gestartet: %@";
+"macro_error_no_permission"   = "Bitte zuerst in den Systemeinstellungen den Zugriff auf Bedienungshilfen erlauben";
+"macro_error_long_press_multi_key" = "\"Langes Druecken\" erlaubt nur eine Taste, weitere werden ignoriert";

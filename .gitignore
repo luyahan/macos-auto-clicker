@@ -103,3 +103,6 @@ fastlane/test_output
 
 iOSInjectionProject/
 .vscode/
+
+# WorkBuddy local state
+.workbuddy/

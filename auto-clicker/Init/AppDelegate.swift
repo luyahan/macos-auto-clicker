@@ -58,6 +58,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
 
     func applicationWillBecomeActive(_ notification: Notification) {
         WindowStateService.refreshKeepWindowOnTop()
+
+        // TCC can be changed while the app is running. Refresh on activation so the UI and the
+        // permission-gated execution path see the current state.
+        PermissionsService.shared.refresh()
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        // Cancel work and release any held key/mouse button before the process disappears.
+        MacroRunner.shared.stop()
+        PermissionsService.shared.stopPolling()
     }
 
     func applicationDidHide(_ notification: Notification) {

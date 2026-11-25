@@ -13,8 +13,10 @@
 //  the app and runs the armed macro through `AutoClickSimulator`.
 //
 
+import ApplicationServices
 import Combine
 import Foundation
+import Defaults
 import KeyboardShortcuts
 
 final class MacroRunner: ObservableObject {
@@ -74,10 +76,18 @@ final class MacroRunner: ObservableObject {
             return
         }
 
-        guard let macro = MacroStore.shared.activeMacro else {
+        guard AXIsProcessTrusted() else {
+            self.lastRefusal = NSLocalizedString("macro_error_no_permission", comment: "Accessibility permission missing")
+            return
+        }
+
+        guard let storedMacro = MacroStore.shared.activeMacro else {
             self.lastRefusal = NSLocalizedString("macro_error_none_armed", comment: "No macro armed")
             return
         }
+
+        // Persisted values may be malformed or migrated from an older build. Clamp before use.
+        let macro = storedMacro.validatedForExecution()
 
         // The macro's mode may not be able to deliver the combination it holds, e.g. a simultaneous
         //  chord with two keys in it. Refusing is better than running something the name does not
@@ -87,8 +97,17 @@ final class MacroRunner: ObservableObject {
             return
         }
 
+        if macro.executionScope == .application {
+            guard let targetBundleIdentifier = macro.targetBundleIdentifier else {
+                self.lastRefusal = NSLocalizedString("macro_error_target_missing", comment: "No target application selected")
+                return
+            }
+        }
+
         self.lastRefusal = nil
-        self.run(using: macro.pressState, name: macro.name)
+        self.run(using: macro.pressState,
+                 name: macro.name,
+                 targetBundleIdentifier: macro.executionScope == .application ? macro.targetBundleIdentifier : nil)
     }
 
     func stop() {
@@ -99,17 +118,23 @@ final class MacroRunner: ObservableObject {
     }
 
     /// The one start path: an optional start delay, then the run.
-    private func run(using state: FormState, name: String?) {
+    private func run(using state: FormState, name: String?, targetBundleIdentifier: String?) {
         let begin = {
-            AutoClickSimulator.shared.start(using: state)
+            AutoClickSimulator.shared.start(using: state, targetBundleIdentifier: targetBundleIdentifier)
 
-            if let name {
-                NotificationService.scheduleNotification(
-                    title: String(format: NSLocalizedString("macro_started_title", comment: "Macro started"),
-                                  name),
-                    date: Date()
-                )
+            // The simulator refuses invalid runs before any event is posted. Only announce a
+            // macro that actually started, and honour the user's notification preference.
+            guard let name,
+                  AutoClickSimulator.shared.isAutoClicking,
+                  Defaults[.notifyOnStart] else {
+                return
             }
+
+            NotificationService.scheduleNotification(
+                title: String(format: NSLocalizedString("macro_started_title", comment: "Macro started"),
+                              name),
+                date: Date()
+            )
         }
 
         if state.startDelay > 0 {

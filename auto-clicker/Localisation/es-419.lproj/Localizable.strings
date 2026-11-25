@@ -159,6 +159,11 @@
 "macro_field_name"            = "Nombre del macro";
 "macro_field_combo"           = "Combinacion de teclas";
 "macro_field_mode"            = "Modo de activacion";
+"macro_field_scope"           = "Ambito";
+"macro_scope_global"          = "Global";
+"macro_scope_application"     = "Aplicacion especifica";
+"macro_scope_select_application" = "Seleccionar aplicacion activa";
+"macro_scope_application_hint" = "Solo se ejecuta con la aplicacion objetivo al frente; en caso contrario se pausa";
 
 "macro_options_header"        = "Opciones adicionales";
 "macro_option_repeat"         = "Repeticiones";
@@ -185,4 +190,7 @@
 "macro_error_none_armed"      = "Ninguna macro activa, haz clic en un circulo de la izquierda";
 "macro_error_no_key"          = "Esta macro solo tiene teclas modificadoras";
 "macro_error_simultaneous_multi_key" = "\"Simultaneo\" admite una sola tecla normal, las demas se ignoran";
+"macro_error_target_missing"  = "Selecciona primero una aplicacion objetivo";
 "macro_started_title"         = "Iniciado: %@";
+"macro_error_no_permission"   = "Concede primero el acceso a Accesibilidad en Ajustes del sistema";
+"macro_error_long_press_multi_key" = "\"Pulsacion larga\" admite una sola tecla, las demas se ignoran";

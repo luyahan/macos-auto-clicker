@@ -60,12 +60,32 @@ final class LoggerService {
         ])
     }
 
+    /// Input events contain what the user typed and where they clicked. Debug logging of those
+    /// values is opt-in even in Debug builds so a development session cannot silently record them.
+    private static var verboseInputLogging: Bool {
+        #if DEBUG
+        return UserDefaults.standard.bool(forKey: "debug_verbose_input_logging")
+        #else
+        return false
+        #endif
+    }
+
     static func simPress(input: Input, location: CGPoint, callingFile: String = #fileID, callingFunction: String = #function) {
+        guard LoggerService.verboseInputLogging else { return }
+
         LoggerService.log(file: callingFile, function: callingFunction, [
             "Key: \(input.readable)",
             "Mod: \(input.modifiers)",
             "Loc. X: \(location.x)",
             "Loc. Y: \(location.y)"
+        ])
+    }
+
+    static func logNotificationError(_ error: Error,
+                                     callingFile: String = #fileID,
+                                     callingFunction: String = #function) {
+        LoggerService.log(file: callingFile, function: callingFunction, [
+            "Notification error: \(error.localizedDescription)"
         ])
     }
 }

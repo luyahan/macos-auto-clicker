@@ -23,15 +23,34 @@ final class PermissionsService: ObservableObject {
     static var shared: PermissionsService = .init()
     private init() {}
 
-    func pollAccessibilityPrivileges(onTrusted: @escaping () -> Void) {
-        LoggerService.permissionTrustedState()
+    /// Prevents stacked polling chains when the window is rebuilt or reappears.
+    private var isPolling = false
 
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            self.isTrusted = AXIsProcessTrusted()
+    func refresh() {
+        self.isTrusted = AXIsProcessTrusted()
+    }
+
+    func stopPolling() {
+        self.isPolling = false
+    }
+
+    func pollAccessibilityPrivileges(onTrusted: @escaping () -> Void) {
+        guard !self.isPolling else { return }
+        self.isPolling = true
+        LoggerService.permissionTrustedState()
+        self.schedulePoll(onTrusted: onTrusted)
+    }
+
+    private func schedulePoll(onTrusted: @escaping () -> Void) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self, self.isPolling else { return }
+
+            self.refresh()
 
             if !self.isTrusted {
-                self.pollAccessibilityPrivileges(onTrusted: onTrusted)
+                self.schedulePoll(onTrusted: onTrusted)
             } else {
+                self.isPolling = false
                 onTrusted()
             }
         }

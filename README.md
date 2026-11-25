@@ -85,7 +85,7 @@ All the auto clickers out there were either really outdated, old, buggy and/or h
     <li>Swift UI</li>
     <li>Package: <a href="https://github.com/sindresorhus/KeyboardShortcuts">sindresorhus/KeyboardShortcuts</a></li>
     <li>Package: <a href="https://github.com/sindresorhus/Defaults">sindresorhus/Defaults</a></li>
-    <li>Package: <a href="https://github.com/othyn/DateStrings">othyn/DateStrings</a></li>
+    <li>Package: <a href="https://github.com/sindresorhus/LaunchAtLogin-Modern">sindresorhus/LaunchAtLogin-Modern</a></li>
 </ul>
 
 <!-- Features -->
@@ -124,27 +124,16 @@ All the auto clickers out there were either really outdated, old, buggy and/or h
 
 ### Using the app for the first time
 
-When first using the app, you will need to right click the app and click 'Open', then on the macOS popup window select 'Open' again to trust this version of the app going forward. This is as at the moment I don't have a paid Apple developer account in order to notarize the app.
+Official release builds are Developer ID signed, notarized and stapled by CI. Open `AutoClicker.zip`, run the app normally, and approve the Accessibility permission request in System Settings.
 
-#### First time use for macOS Sequoia (15) users
+Each release also publishes `AutoClicker.zip.sha256`. Verify the download before opening it:
 
-If you are using macOS Sequoia, there are increased barriers in place to stop you running un-notarized apps. To open the app you will need to do the following;
+```sh
+shasum -a 256 AutoClicker.zip
+# compare with the contents of AutoClicker.zip.sha256 from the same release
+```
 
-1. Try to open the app, and when presented with the options to 'Move to trash' or otherwise, close out of that prompt.
-2. Head over to System Settings > Privacy & Security > Security, and scroll all the way at the bottom, you should see the following:
-
-<div align=center>
-    <img width="75%" src="art/ref/readme_macOS_sequoia_settings.png"/>
-</div>
-
-3. Click on the 'Open Anyway' button.
-4. When prompted with the following dialogue, click 'Open Anyway':
-
-<div align=center>
-    <img width="25%" src="art/ref/readme_macOS_sequoia_prompt.png"/>
-</div>
-
-5. Head back to the AutoClicker app and try opening it again, it should now work as normal.
+Locally built or older (pre-notarization) copies are still blocked by Gatekeeper. If you deliberately run one of those, right-click the app and choose **Open**, then confirm on the macOS dialog. On macOS Sequoia (15), go to System Settings > Privacy & Security and use **Open Anyway** when it appears. Prefer an official notarized release whenever possible: bypassing Gatekeeper removes the distribution checks that confirm the download has not been tampered with.
 
 ### When updating the app, does the permission screen get stuck even though you've given it permission?
 
@@ -211,7 +200,7 @@ Useful resources and libraries that have been used in the making of this project
 - Readme: [Louis3797/awesome-readme-template](https://github.com/Louis3797/awesome-readme-template)
 - Package: [sindresorhus/KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts)
 - Package: [sindresorhus/Defaults](https://github.com/sindresorhus/Defaults)
-- Package: [othyn/DateStrings](https://github.com/othyn/DateStrings)
+- Package: [sindresorhus/LaunchAtLogin-Modern](https://github.com/sindresorhus/LaunchAtLogin-Modern)
 
 ---
 
