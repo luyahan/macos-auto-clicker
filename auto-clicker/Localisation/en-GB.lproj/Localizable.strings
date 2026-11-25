@@ -145,11 +145,11 @@
 
 "app_title" = "TriggerPilot";
 
-"macro_exclusive_notice"      = "同一时间仅启用一个宏，切换即停用其他";
+"macro_exclusive_notice"      = "1 个循环宏 + 多个一次性宏可同时启用，各自独立触发";
 "macro_add"                   = "新建宏";
 "macro_status_listening"      = "监听中";
 "macro_stat_saved"            = "已保存宏";
-"macro_stat_active"           = "当前启用";
+"macro_stat_active"           = "已启用";
 "macro_stat_triggered"        = "今日触发";
 
 "macro_key_count"             = "%lld 键";
@@ -200,10 +200,28 @@
 "macro_slot_add"              = "添加按键";
 
 "macro_status_running"        = "运行中";
-"macro_error_none_armed"      = "未启用任何宏，请先点击左侧圆圈启用一个宏";
+"macro_error_none_armed"      = "全局开始仅作用于循环宏；单次触发宏请用各自的开关";
 "macro_error_no_key"          = "该宏只有修饰键，没有可触发的按键";
 "macro_error_simultaneous_multi_key" = "「同时按下」只能有一个普通按键，多余的按键不会被触发";
 "macro_error_target_missing"  = "请先为该宏选择目标应用";
 "macro_started_title"         = "已启动：%@";
 "macro_error_no_permission"   = "请先在系统设置中授予辅助功能权限";
 "macro_error_long_press_multi_key" = "「长按」只能有一个按键，多余的按键不会被触发";
+
+/* One-shot ("trigger once") macros */
+
+"macro_activation_repeating"  = "自动循环";
+"macro_activation_one_shot"   = "单次触发";
+"macro_field_activation"      = "宏用途";
+"macro_field_trigger"         = "触发按键";
+"macro_trigger_capture"       = "点击录制";
+"macro_one_shot_hint"         = "按下触发键时只执行一轮，不会循环；可同时启用多个";
+"macro_one_shot_options_hint" = "单次触发宏固定执行 1 轮，无延迟、无轮次间隔";
+"macro_section_repeating"     = "自动循环（同时仅启用 1 个）";
+"macro_section_one_shot"      = "单次触发（可同时启用多个）";
+"macro_add_repeating"         = "新建循环宏";
+"macro_add_one_shot"          = "新建单次触发宏";
+"macro_untitled_one_shot"     = "未命名单次宏 %d";
+"macro_error_trigger_missing" = "请先为该宏录制一个触发按键或鼠标键";
+"macro_error_trigger_shortcut" = "触发键与全局开始/停止快捷键冲突，请换一个";
+"macro_error_trigger_conflict" = "触发键已被「%@」占用，请先关闭该宏或换一个触发键";

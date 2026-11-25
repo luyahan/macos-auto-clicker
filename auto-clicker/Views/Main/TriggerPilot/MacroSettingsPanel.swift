@@ -18,6 +18,12 @@ struct MacroSettingsPanel: View {
     /// The slot currently recording a key press, or `nil` when no capture is in progress.
     @State private var capturingSlot: Int?
 
+    /// Separately records the one-shot macro's own trigger, using the same capture overlay.
+    @State private var isCapturingTrigger = false
+
+    /// Why the last save was refused, shown in the foot bar instead of silently doing nothing.
+    @State private var validationMessage: String?
+
     /// Watches for a mouse button while a slot is recording.
     ///
     /// The capture view is a real view rather than a SwiftUI gesture, so a left click has to be
@@ -55,6 +61,7 @@ struct MacroSettingsPanel: View {
             ScrollView(.vertical, showsIndicators: false) {
                 VStack(spacing: TPMetrics.panelBodySpacing) {
                     self.nameField
+                    self.activationSection
                     self.comboSection
                     self.modeSection
                     self.scopeSection
@@ -82,12 +89,21 @@ struct MacroSettingsPanel: View {
         // Sheets are their own `NSWindow` and would otherwise paint an opaque square backing
         //  behind the panel's rounded corners.
         .background(PanelWindowConfigurator())
-        .onAppear(perform: self.clearInitialFocus)
+        .onAppear {
+            self.clearInitialFocus()
+            // Recording a trigger must not fire an already-armed macro, and editing a macro should
+            //  not be interrupted by a background run. The single global listener is muted while
+            //  this sheet is open.
+            MacroTriggerService.shared.setSuspended(true)
+        }
         // The monitor is owned by this view, so it has to go when the panel does: a surviving
         //  monitor would swallow the next click anywhere in the app.
-        .onDisappear(perform: self.stopMouseMonitor)
+        .onDisappear {
+            self.stopMouseMonitor()
+            MacroTriggerService.shared.setSuspended(false)
+        }
         .overlay {
-            if self.capturingSlot != nil {
+            if self.capturingSlot != nil || self.isCapturingTrigger {
                 self.captureOverlay
             }
         }
@@ -207,6 +223,93 @@ struct MacroSettingsPanel: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
+    // MARK: - Activation section
+
+    /// Picks between the original looping macro and a one-shot mouse macro. Only the latter shows
+    ///  a trigger to record, because a looping macro is started by the global Start shortcut.
+    private var activationSection: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            self.fieldLabel("macro_field_activation", comment: "Macro activation field label")
+
+            HStack(spacing: 4) {
+                ForEach(MacroActivation.allCases) { activation in
+                    let isOn = activation == self.draft.activation
+
+                    Button {
+                        self.draft.activation = activation
+                        self.validationMessage = nil
+
+                        if activation == .oneShot, self.draft.trigger == nil {
+                            self.draft.trigger = MacroTrigger(mouseButton: 3)
+                        }
+                    } label: {
+                        Text(LocalizedStringKey(activation.localised))
+                            .font(TPType.text(11.5, weight: isOn ? .medium : .regular))
+                            .foregroundColor(isOn ? .white : TPPalette.textSoft)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: TPMetrics.segmentHeight)
+                            .triggerPilotSurface(
+                                fill: isOn ? TPPalette.accent : .clear,
+                                cornerRadius: TPMetrics.stepperCornerRadius
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(3)
+            .frame(height: 36)
+            .triggerPilotSurface(
+                fill: Color.black.opacity(0.28),
+                cornerRadius: TPMetrics.optionRowCornerRadius
+            )
+
+            if self.draft.activation == .oneShot {
+                self.triggerRow
+
+                Text("macro_one_shot_hint", comment: "One-shot macro behaviour hint")
+                    .font(TPType.text(10.5))
+                    .foregroundColor(TPPalette.accentMauve)
+
+                if let issue = self.draft.triggerIssue {
+                    Text(LocalizedStringKey(issue))
+                        .font(TPType.text(10.5))
+                        .foregroundColor(TPPalette.warning)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// A one-shot macro's own trigger. The button starts the same capture flow as a key slot, but
+    ///  records a `MacroTrigger` rather than a `KeyCap`.
+    private var triggerRow: some View {
+        HStack(spacing: 8) {
+            Text(NSLocalizedString("macro_field_trigger", comment: "Trigger field label"))
+                .font(TPType.text(11.5))
+                .foregroundColor(TPPalette.textPrimary)
+
+            Spacer(minLength: 0)
+
+            Button {
+                self.beginTriggerCapture()
+            } label: {
+                Text(self.draft.trigger?.displayLabel
+                     ?? NSLocalizedString("macro_trigger_capture", comment: "Capture trigger button"))
+                    .font(TPType.mono(11))
+                    .foregroundColor(TPPalette.accentLabel)
+                    .lineLimit(1)
+                    .padding(.horizontal, 10)
+                    .frame(height: 30)
+                    .triggerPilotSurface(
+                        fill: TPPalette.surface,
+                        cornerRadius: TPMetrics.fieldCornerRadius,
+                        stroke: TPPalette.accentBright.opacity(0.34)
+                    )
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
     // MARK: - Combo section (2:426)
 
     private var comboSection: some View {
@@ -244,12 +347,21 @@ struct MacroSettingsPanel: View {
     ///  existing slot replaces its key rather than appending, and tapping an empty slot appends.
     private func beginCapture(_ index: Int) {
         self.isNameFocused = false
+        self.isCapturingTrigger = false
         self.capturingSlot = index
+        self.startMouseMonitor()
+    }
+
+    private func beginTriggerCapture() {
+        self.isNameFocused = false
+        self.capturingSlot = nil
+        self.isCapturingTrigger = true
         self.startMouseMonitor()
     }
 
     private func endCapture() {
         self.capturingSlot = nil
+        self.isCapturingTrigger = false
         self.stopMouseMonitor()
     }
 
@@ -262,8 +374,8 @@ struct MacroSettingsPanel: View {
             matching: [.leftMouseDown, .rightMouseDown, .otherMouseDown]
         ) { event in
             // The monitor is torn down by `endCapture`, but a click can still arrive in the gap
-            //  between the slot being cleared and the monitor being removed.
-            guard self.capturingSlot != nil else {
+            //  between the capture flag being cleared and the monitor being removed.
+            guard self.capturingSlot != nil || self.isCapturingTrigger else {
                 return event
             }
 
@@ -282,6 +394,16 @@ struct MacroSettingsPanel: View {
     }
 
     private func apply(_ event: NSEvent) {
+        if self.isCapturingTrigger {
+            if let trigger = MacroTrigger.captured(from: event) {
+                self.draft.trigger = trigger
+                self.validationMessage = nil
+            }
+
+            self.endCapture()
+            return
+        }
+
         guard let index = self.capturingSlot else {
             return
         }
@@ -481,97 +603,13 @@ struct MacroSettingsPanel: View {
                 .font(TPType.text(11, weight: .medium))
                 .foregroundColor(TPPalette.textMutedBright)
 
-            // 6:5 Option Repeat
-            self.optionRow(height: 46, spacing: 10) {
-                RepeatGlyph()
-                    .frame(width: 15, height: 15)
-
-                self.optionLabel("macro_option_repeat", comment: "Repeat count option")
-
-                Spacer(minLength: 0)
-
-                HStack(spacing: 0) {
-                    self.stepperButton(glyph: MinusGlyph(), colour: TPPalette.textCool) {
-                        self.setRepeatCount(self.draft.repeatCount - 1)
-                    }
-
-                    // Typed rather than only stepped: a macro that repeats 200 times is tedious to
-                    //  reach one click at a time.
-                    TextField("", text: self.$repeatText)
-                        .textFieldStyle(.plain)
-                        .font(TPType.mono(12))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .focused(self.$isRepeatFocused)
-                        .frame(width: 32)
-                        .onSubmit(commitRepeatCount)
-                        .onChange(of: self.repeatText) { newValue in
-                            // Digits only, and the draft follows along so that saving without ever
-                            //  leaving the field still keeps what was typed.
-                            let digits = newValue.filter { $0.isWholeNumber }
-
-                            if digits != newValue {
-                                self.repeatText = digits
-                            }
-
-                            if let value = Int(digits) {
-                                self.draft.repeatCount = self.clampRepeatCount(value)
-                            }
-                        }
-                        .onChange(of: self.draft.repeatCount) { newValue in
-                            // Keeps the field in step with the stepper buttons.
-                            let text = String(newValue)
-
-                            if self.repeatText != text {
-                                self.repeatText = text
-                            }
-                        }
-                        .onChange(of: self.isRepeatFocused) { focused in
-                            if !focused {
-                                self.commitRepeatCount()
-                            }
-                        }
-
-                    self.stepperButton(glyph: PlusGlyph(), colour: TPPalette.accentPale) {
-                        self.setRepeatCount(self.draft.repeatCount + 1)
-                    }
-                }
-                .frame(height: 26)
-                .triggerPilotSurface(
-                    fill: Color.white.opacity(0.09),
-                    cornerRadius: TPMetrics.stepperCornerRadius
-                )
+            // Repeat count, start delay and the gap between rounds only mean anything for a macro
+            //  that loops. A one-shot macro always plays one round immediately.
+            if self.draft.activation == .repeating {
+                self.repeatingOptions
+            } else {
+                self.oneShotOptionsHint
             }
-
-            // 6:6 Option Delay
-            self.optionRow(height: 39, spacing: 10) {
-                ClockGlyph()
-                    .frame(width: 15, height: 15)
-
-                self.optionLabel("macro_option_delay", comment: "Delay option")
-
-                Spacer(minLength: 0)
-
-                Text(self.delayText)
-                    .font(TPType.mono(12))
-                    .foregroundColor(TPPalette.textSoft)
-                    .layoutPriority(1)
-
-                TPSwitch(isOn: self.$draft.delayEnabled, width: 32, height: 19, onOpacity: 0.85)
-            }
-
-            // 6:42 Option Hint Row
-            HStack(spacing: 6) {
-                LinkGlyph()
-                    .frame(width: 12, height: 12)
-
-                Text("macro_option_hint", comment: "Option linkage hint")
-                    .font(TPType.text(10.5))
-                    .foregroundColor(TPPalette.accentMauve)
-
-                Spacer(minLength: 0)
-            }
-            .frame(height: 13)
 
             // The interval only spaces out a sequential macro's presses, so the design hides the
             //  card in the other two modes rather than showing a control that does nothing.
@@ -579,11 +617,126 @@ struct MacroSettingsPanel: View {
                 self.intervalOption
             }
 
-            // Unlike the interval above, every mode repeats whole rounds, so this card is always
-            //  shown.
-            self.roundIntervalOption
+            // Only a looping macro has a second round to wait for.
+            if self.draft.activation == .repeating {
+                self.roundIntervalOption
+            }
 
             DividerHairline(height: 1, opacity: 0.06)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var oneShotOptionsHint: some View {
+        HStack(spacing: 6) {
+            LinkGlyph()
+                .frame(width: 12, height: 12)
+
+            Text("macro_one_shot_options_hint", comment: "One-shot options hint")
+                .font(TPType.text(10.5))
+                .foregroundColor(TPPalette.accentMauve)
+
+            Spacer(minLength: 0)
+        }
+        .frame(height: 13)
+    }
+
+    /// Repeat count, start delay and the original linkage hint, all of which only apply to a
+    ///  looping macro. Grouped so `optionsSection` stays a flat list of visible rows.
+    private var repeatingOptions: some View {
+        VStack(alignment: .leading, spacing: 9) {
+
+                // 6:5 Option Repeat
+                self.optionRow(height: 46, spacing: 10) {
+                    RepeatGlyph()
+                        .frame(width: 15, height: 15)
+
+                    self.optionLabel("macro_option_repeat", comment: "Repeat count option")
+
+                    Spacer(minLength: 0)
+
+                    HStack(spacing: 0) {
+                        self.stepperButton(glyph: MinusGlyph(), colour: TPPalette.textCool) {
+                            self.setRepeatCount(self.draft.repeatCount - 1)
+                        }
+
+                        // Typed rather than only stepped: a macro that repeats 200 times is tedious to
+                        //  reach one click at a time.
+                        TextField("", text: self.$repeatText)
+                            .textFieldStyle(.plain)
+                            .font(TPType.mono(12))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .focused(self.$isRepeatFocused)
+                            .frame(width: 32)
+                            .onSubmit(commitRepeatCount)
+                            .onChange(of: self.repeatText) { newValue in
+                                // Digits only, and the draft follows along so that saving without ever
+                                //  leaving the field still keeps what was typed.
+                                let digits = newValue.filter { $0.isWholeNumber }
+
+                                if digits != newValue {
+                                    self.repeatText = digits
+                                }
+
+                                if let value = Int(digits) {
+                                    self.draft.repeatCount = self.clampRepeatCount(value)
+                                }
+                            }
+                            .onChange(of: self.draft.repeatCount) { newValue in
+                                // Keeps the field in step with the stepper buttons.
+                                let text = String(newValue)
+
+                                if self.repeatText != text {
+                                    self.repeatText = text
+                                }
+                            }
+                            .onChange(of: self.isRepeatFocused) { focused in
+                                if !focused {
+                                    self.commitRepeatCount()
+                                }
+                            }
+
+                        self.stepperButton(glyph: PlusGlyph(), colour: TPPalette.accentPale) {
+                            self.setRepeatCount(self.draft.repeatCount + 1)
+                        }
+                    }
+                    .frame(height: 26)
+                    .triggerPilotSurface(
+                        fill: Color.white.opacity(0.09),
+                        cornerRadius: TPMetrics.stepperCornerRadius
+                    )
+                }
+
+                // 6:6 Option Delay
+                self.optionRow(height: 39, spacing: 10) {
+                    ClockGlyph()
+                        .frame(width: 15, height: 15)
+
+                    self.optionLabel("macro_option_delay", comment: "Delay option")
+
+                    Spacer(minLength: 0)
+
+                    Text(self.delayText)
+                        .font(TPType.mono(12))
+                        .foregroundColor(TPPalette.textSoft)
+                        .layoutPriority(1)
+
+                    TPSwitch(isOn: self.$draft.delayEnabled, width: 32, height: 19, onOpacity: 0.85)
+                }
+
+                // 6:42 Option Hint Row
+                HStack(spacing: 6) {
+                    LinkGlyph()
+                        .frame(width: 12, height: 12)
+
+                    Text("macro_option_hint", comment: "Option linkage hint")
+                        .font(TPType.text(10.5))
+                        .foregroundColor(TPPalette.accentMauve)
+
+                    Spacer(minLength: 0)
+                }
+                .frame(height: 13)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -753,6 +906,13 @@ struct MacroSettingsPanel: View {
 
     private var footBar: some View {
         HStack(spacing: 10) {
+            if let message = self.validationMessage {
+                Text(message)
+                    .font(TPType.text(10))
+                    .foregroundColor(TPPalette.warning)
+                    .lineLimit(2)
+            }
+
             Spacer(minLength: 0)
 
             Button {
@@ -768,14 +928,7 @@ struct MacroSettingsPanel: View {
             .buttonStyle(.plain)
 
             Button {
-                self.draft.intervalMilliseconds = Int(self.intervalMilliseconds.rounded())
-                self.draft.roundIntervalMilliseconds = Int(self.roundIntervalMilliseconds.rounded())
-                // The field is committed as well, in case the panel is saved by the button while
-                //  the count is still being typed.
-                self.commitRepeatCount()
-                self.pruneCapsForMode()
-                MacroStore.shared.save(self.draft)
-                self.dismiss()
+                self.commitChanges()
             } label: {
                 Text("macro_save", comment: "Save macro button")
                     .font(TPType.text(12, weight: .medium))
@@ -789,6 +942,43 @@ struct MacroSettingsPanel: View {
         .frame(height: 50)
         .frame(maxWidth: .infinity)
         .background(Color.white.opacity(0.03))
+    }
+
+    /// Validates and writes the draft. A one-shot macro without a usable (and unique) trigger is
+    ///  refused here, while the panel is still open, rather than being saved and then silently
+    ///  ignored by the trigger monitor.
+    /// Validates and writes the draft.
+    ///
+    /// A one-shot macro without a usable trigger is refused here (missing trigger, or a collision
+    ///  with the global Start/Stop shortcut). A trigger that another enabled one-shot already uses
+    ///  is *not* refused: saving goes through `MacroStore.save`, which applies the same
+    ///  "most recently enabled wins" rule as the list's enable switch and disarms the other macro.
+    private func commitChanges() {
+        self.draft.intervalMilliseconds = Int(self.intervalMilliseconds.rounded())
+        self.draft.roundIntervalMilliseconds = Int(self.roundIntervalMilliseconds.rounded())
+        // The field is committed as well, in case the panel is saved by the button while
+        //  the count is still being typed.
+        self.commitRepeatCount()
+        self.pruneCapsForMode()
+
+        if self.draft.activation == .oneShot {
+            self.draft.repeatCount = 1
+            self.draft.delayEnabled = false
+            self.draft.delaySeconds = 0
+            self.draft.trigger = self.draft.trigger?.normalized
+
+            if let issue = self.draft.triggerIssue {
+                self.validationMessage = NSLocalizedString(issue,
+                                                           comment: "One-shot trigger cannot be used")
+                return
+            }
+        } else {
+            self.draft.isEnabled = false
+        }
+
+        self.validationMessage = nil
+        MacroStore.shared.save(self.draft)
+        self.dismiss()
     }
 
     // MARK: - Formatting

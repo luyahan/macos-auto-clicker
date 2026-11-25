@@ -132,11 +132,11 @@
 
 "app_title" = "TriggerPilot";
 
-"macro_exclusive_notice"      = "Solo puede haber un macro activo a la vez; al cambiar se desactivan los demas";
+"macro_exclusive_notice"      = "1 macro en bucle y varios macros de un solo disparo pueden estar activos a la vez";
 "macro_add"                   = "Nuevo macro";
 "macro_status_listening"      = "Escuchando";
 "macro_stat_saved"            = "Macros guardados";
-"macro_stat_active"           = "Activo";
+"macro_stat_active"           = "Activados";
 "macro_stat_triggered"        = "Activados hoy";
 
 "macro_key_count"             = "%lld teclas";
@@ -187,10 +187,28 @@
 "macro_slot_add"              = "Anadir tecla";
 
 "macro_status_running"        = "En ejecucion";
-"macro_error_none_armed"      = "Ninguna macro activa, haz clic en un circulo de la izquierda";
+"macro_error_none_armed"      = "El inicio global solo aplica al macro en bucle; activa los macros unicos con su interruptor";
 "macro_error_no_key"          = "Esta macro solo tiene teclas modificadoras";
 "macro_error_simultaneous_multi_key" = "\"Simultaneo\" admite una sola tecla normal, las demas se ignoran";
 "macro_error_target_missing"  = "Selecciona primero una aplicacion objetivo";
 "macro_started_title"         = "Iniciado: %@";
 "macro_error_no_permission"   = "Concede primero el acceso a Accesibilidad en Ajustes del sistema";
 "macro_error_long_press_multi_key" = "\"Pulsacion larga\" admite una sola tecla, las demas se ignoran";
+
+/* Macros de un solo disparo */
+
+"macro_activation_repeating"  = "En bucle";
+"macro_activation_one_shot"   = "Un solo disparo";
+"macro_field_activation"      = "Tipo de macro";
+"macro_field_trigger"         = "Disparador";
+"macro_trigger_capture"       = "Grabar";
+"macro_one_shot_hint"         = "Cada pulsacion ejecuta una sola ronda; puedes activar varios a la vez";
+"macro_one_shot_options_hint" = "Los macros de un solo disparo ejecutan 1 ronda sin retardo";
+"macro_section_repeating"     = "En bucle (solo 1 activo)";
+"macro_section_one_shot"      = "Un solo disparo (varios activos)";
+"macro_add_repeating"         = "Nuevo macro en bucle";
+"macro_add_one_shot"          = "Nuevo macro de un solo disparo";
+"macro_untitled_one_shot"     = "Macro unico sin nombre %d";
+"macro_error_trigger_missing" = "Graba primero una tecla o boton del raton como disparador";
+"macro_error_trigger_shortcut" = "El disparador coincide con el atajo global de inicio/parada";
+"macro_error_trigger_conflict" = "Este disparador ya lo usa \"%@\"";

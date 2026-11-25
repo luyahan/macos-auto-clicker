@@ -62,6 +62,10 @@ final class MacroRunner: ObservableObject {
         KeyboardShortcuts.onKeyUp(for: .pressStopButton) { [weak self] in
             self?.stop()
         }
+
+        // One-shot macros listen for their own triggers for the whole app lifetime. Registration
+        //  is idempotent, so this is the right place to install that single global monitor too.
+        MacroTriggerService.shared.start()
     }
 
     /// Runs the armed macro.
@@ -81,7 +85,10 @@ final class MacroRunner: ObservableObject {
             return
         }
 
-        guard let storedMacro = MacroStore.shared.activeMacro else {
+        // One-shot macros are never started by the global shortcut: they fire from their own
+        //  trigger. Starting one here would replay a macro the user never armed as a loop.
+        guard let storedMacro = MacroStore.shared.activeMacro,
+              storedMacro.activation == .repeating else {
             self.lastRefusal = NSLocalizedString("macro_error_none_armed", comment: "No macro armed")
             return
         }
@@ -97,11 +104,9 @@ final class MacroRunner: ObservableObject {
             return
         }
 
-        if macro.executionScope == .application {
-            guard let targetBundleIdentifier = macro.targetBundleIdentifier else {
-                self.lastRefusal = NSLocalizedString("macro_error_target_missing", comment: "No target application selected")
-                return
-            }
+        if macro.executionScope == .application, macro.targetBundleIdentifier == nil {
+            self.lastRefusal = NSLocalizedString("macro_error_target_missing", comment: "No target application selected")
+            return
         }
 
         self.lastRefusal = nil
@@ -115,6 +120,9 @@ final class MacroRunner: ObservableObject {
         //  its onFinish handler, restarting the run the user just asked to stop.
         DelayTimer.shared.stop()
         AutoClickSimulator.shared.stop()
+        // Global Stop means everything, including in-flight one-shot runs. The triggers themselves
+        //  stay armed: a switch, not a run, controls whether a macro listens.
+        MacroRunCoordinator.shared.stopAll()
     }
 
     /// The one start path: an optional start delay, then the run.

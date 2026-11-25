@@ -61,6 +61,10 @@
 		C8808C5AA5A6AF4DE614ADF9 /* Macro.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A80A2991BA1C19356D2C9E8 /* Macro.swift */; };
 		02553A52E4E5B0FFD0A564DA /* MacroStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A312BAAC6635E72C15E0BEE0 /* MacroStore.swift */; };
 		D4A71C6B9F2E4D3A8B5C1E90 /* MacroRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4A71C6B9F2E4D3A8B5C1E91 /* MacroRunner.swift */; };
+		ABCDEF0123456789ABCDEF02 /* MacroTrigger.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF0123456789ABCDEF01 /* MacroTrigger.swift */; };
+		ABCDEF0123456789ABCDEF04 /* MacroEventFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF0123456789ABCDEF03 /* MacroEventFactory.swift */; };
+		ABCDEF0123456789ABCDEF06 /* MacroRun.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF0123456789ABCDEF05 /* MacroRun.swift */; };
+		ABCDEF0123456789ABCDEF08 /* MacroRunCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABCDEF0123456789ABCDEF07 /* MacroRunCoordinator.swift */; };
 		3F1B7C2D9A4E50B18C6D7E42 /* TriggerCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F1B7C2D9A4E50B18C6D7E43 /* TriggerCounter.swift */; };
 		43CE8FAA45086EFB07A2EAAF /* TriggerPilotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13BC416E5971D58FA49FE69 /* TriggerPilotView.swift */; };
 		659941BFD766D35C01808D9F /* MacroSettingsPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38CE4EC9A66D6B07F721A615 /* MacroSettingsPanel.swift */; };
@@ -74,7 +78,18 @@
 		D3E9041C7741357EC3FF2B31 /* TPStatsCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC80E947F55F620ED16D2AFC /* TPStatsCard.swift */; };
 		9B0A27F82D4DE927D4A3B10A /* TPFootBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A3200BFDF25BCCBCB06995B /* TPFootBar.swift */; };
 		C34E0B53A1E29C6F03ADA8B4 /* TPWindowConfigurator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69495D36D66AEE848280E588 /* TPWindowConfigurator.swift */; };
+		AA00000000000000000002 /* MacroStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00000000000000000001 /* MacroStoreTests.swift */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AA0000000000000000000B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B53BDC44264BED93001F8E57 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B53BDC4B264BED93001F8E57;
+			remoteInfo = "auto-clicker";
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		4C5D699E2A4EED3500E72CEE /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -131,6 +146,10 @@
 		2A80A2991BA1C19356D2C9E8 /* Macro.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Macro.swift; sourceTree = "<group>"; };
 		A312BAAC6635E72C15E0BEE0 /* MacroStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroStore.swift; sourceTree = "<group>"; };
 		D4A71C6B9F2E4D3A8B5C1E91 /* MacroRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroRunner.swift; sourceTree = "<group>"; };
+		ABCDEF0123456789ABCDEF01 /* MacroTrigger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroTrigger.swift; sourceTree = "<group>"; };
+		ABCDEF0123456789ABCDEF03 /* MacroEventFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroEventFactory.swift; sourceTree = "<group>"; };
+		ABCDEF0123456789ABCDEF05 /* MacroRun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroRun.swift; sourceTree = "<group>"; };
+		ABCDEF0123456789ABCDEF07 /* MacroRunCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroRunCoordinator.swift; sourceTree = "<group>"; };
 		3F1B7C2D9A4E50B18C6D7E43 /* TriggerCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerCounter.swift; sourceTree = "<group>"; };
 		E13BC416E5971D58FA49FE69 /* TriggerPilotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TriggerPilotView.swift; sourceTree = "<group>"; };
 		38CE4EC9A66D6B07F721A615 /* MacroSettingsPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroSettingsPanel.swift; sourceTree = "<group>"; };
@@ -144,6 +163,8 @@
 		EC80E947F55F620ED16D2AFC /* TPStatsCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TPStatsCard.swift; sourceTree = "<group>"; };
 		9A3200BFDF25BCCBCB06995B /* TPFootBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TPFootBar.swift; sourceTree = "<group>"; };
 		69495D36D66AEE848280E588 /* TPWindowConfigurator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TPWindowConfigurator.swift; sourceTree = "<group>"; };
+		AA00000000000000000001 /* MacroStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacroStoreTests.swift; sourceTree = "<group>"; };
+		AA00000000000000000003 /* auto-clickerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "auto-clickerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -154,6 +175,13 @@
 				B510762827F4BD5500BB1CDA /* Defaults in Frameworks */,
 				B5A042552CB298CC000A1E39 /* LaunchAtLogin in Frameworks */,
 				B510760C27F4A23300BB1CDA /* KeyboardShortcuts in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00000000000000000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -178,6 +206,7 @@
 				B5E4213628057BA900C2CA2D /* LoggerService.swift */,
 				B5BF093F2883230D008092D9 /* MenuBarService.swift */,
 				4C5D699E2A4EED3500E72CEE /* NotificationService.swift */,
+				ABCDEF0123456789ABCDEF03 /* MacroEventFactory.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -235,6 +264,7 @@
 			isa = PBXGroup;
 			children = (
 				2A80A2991BA1C19356D2C9E8 /* Macro.swift */,
+				ABCDEF0123456789ABCDEF01 /* MacroTrigger.swift */,
 				B5F5C60A28039AA40049B04D /* FormState.swift */,
 				B510763F280113DB00BB1CDA /* Input.swift */,
 			);
@@ -252,6 +282,7 @@
 			isa = PBXGroup;
 			children = (
 				B53BDC4E264BED93001F8E57 /* auto-clicker */,
+				AA0000000000000000000D /* auto-clickerTests */,
 				B53BDC4D264BED93001F8E57 /* Products */,
 				B52AF7DA27CA81A300C16B97 /* Frameworks */,
 			);
@@ -261,6 +292,7 @@
 			isa = PBXGroup;
 			children = (
 				B53BDC4C264BED93001F8E57 /* AutoClicker.app */,
+				AA00000000000000000003 /* auto-clickerTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -307,6 +339,8 @@
 			children = (
 				A312BAAC6635E72C15E0BEE0 /* MacroStore.swift */,
 				D4A71C6B9F2E4D3A8B5C1E91 /* MacroRunner.swift */,
+				ABCDEF0123456789ABCDEF05 /* MacroRun.swift */,
+				ABCDEF0123456789ABCDEF07 /* MacroRunCoordinator.swift */,
 				3F1B7C2D9A4E50B18C6D7E43 /* TriggerCounter.swift */,
 				B53027F9264C2748002B8610 /* DelayTimer.swift */,
 				B53027F4264C0D73002B8610 /* AutoClickSimulator.swift */,
@@ -425,6 +459,14 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
+		AA0000000000000000000D /* auto-clickerTests */ = {
+			isa = PBXGroup;
+			children = (
+				AA00000000000000000001 /* MacroStoreTests.swift */,
+			);
+			path = "auto-clickerTests";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -453,7 +495,33 @@
 			productReference = B53BDC4C264BED93001F8E57 /* AutoClicker.app */;
 			productType = "com.apple.product-type.application";
 		};
+		AA00000000000000000007 /* auto-clickerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA00000000000000000008 /* Build configuration list for PBXNativeTarget "auto-clickerTests" */;
+			buildPhases = (
+				AA00000000000000000004 /* Sources */,
+				AA00000000000000000005 /* Frameworks */,
+				AA00000000000000000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AA0000000000000000000C /* PBXTargetDependency */,
+			);
+			name = "auto-clickerTests";
+			productName = "auto-clickerTests";
+			productReference = AA00000000000000000003 /* auto-clickerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
+
+/* Begin PBXTargetDependency section */
+		AA0000000000000000000C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B53BDC4B264BED93001F8E57 /* auto-clicker */;
+			targetProxy = AA0000000000000000000B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		B53BDC44264BED93001F8E57 /* Project object */ = {
@@ -465,6 +533,10 @@
 				TargetAttributes = {
 					B53BDC4B264BED93001F8E57 = {
 						CreatedOnToolsVersion = 12.5;
+					};
+					AA00000000000000000007 = {
+						CreatedOnToolsVersion = 16.0;
+						TestTargetID = B53BDC4B264BED93001F8E57;
 					};
 				};
 			};
@@ -487,6 +559,7 @@
 			projectRoot = "";
 			targets = (
 				B53BDC4B264BED93001F8E57 /* auto-clicker */,
+				AA00000000000000000007 /* auto-clickerTests */,
 			);
 		};
 /* End PBXProject section */
@@ -500,6 +573,13 @@
 				B5BCE80D287C344200B739AD /* Localizable.stringsdict in Resources */,
 				B5BCE80A287C343900B739AD /* Localizable.strings in Resources */,
 				B53BDC54264BED95001F8E57 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00000000000000000006 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,6 +656,10 @@
 				C8808C5AA5A6AF4DE614ADF9 /* Macro.swift in Sources */,
 				02553A52E4E5B0FFD0A564DA /* MacroStore.swift in Sources */,
 				D4A71C6B9F2E4D3A8B5C1E90 /* MacroRunner.swift in Sources */,
+				ABCDEF0123456789ABCDEF02 /* MacroTrigger.swift in Sources */,
+				ABCDEF0123456789ABCDEF04 /* MacroEventFactory.swift in Sources */,
+				ABCDEF0123456789ABCDEF06 /* MacroRun.swift in Sources */,
+				ABCDEF0123456789ABCDEF08 /* MacroRunCoordinator.swift in Sources */,
 				3F1B7C2D9A4E50B18C6D7E42 /* TriggerCounter.swift in Sources */,
 				43CE8FAA45086EFB07A2EAAF /* TriggerPilotView.swift in Sources */,
 				659941BFD766D35C01808D9F /* MacroSettingsPanel.swift in Sources */,
@@ -630,6 +714,14 @@
 				B5E6395327CA62EB008B111A /* ThemedButtonStyle.swift in Sources */,
 				B510762127F4BB4900BB1CDA /* AppearanceSettingsTabView.swift in Sources */,
 				B5BF094328832A4E008092D9 /* MenuBarView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA00000000000000000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA00000000000000000002 /* MacroStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -842,6 +934,40 @@
 			};
 			name = Release;
 		};
+		AA00000000000000000009 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F9FV9SZH5Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.othyn.auto-clickerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AutoClicker.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AutoClicker";
+			};
+			name = Debug;
+		};
+		AA0000000000000000000A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = F9FV9SZH5Z;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.othyn.auto-clickerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/AutoClicker.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/AutoClicker";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -859,6 +985,15 @@
 			buildConfigurations = (
 				B53BDC5D264BED95001F8E57 /* Debug */,
 				B53BDC5E264BED95001F8E57 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA00000000000000000008 /* Build configuration list for PBXNativeTarget "auto-clickerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA00000000000000000009 /* Debug */,
+				AA0000000000000000000A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

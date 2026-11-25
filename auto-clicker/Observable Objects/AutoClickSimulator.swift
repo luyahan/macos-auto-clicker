@@ -36,7 +36,6 @@ final class AutoClickSimulator: ObservableObject {
     }
 
     private var timer: Timer?
-    private var mouseLocation: NSPoint { NSEvent.mouseLocation }
     private var activity: Cancellable?
 
     private var monitorObject: Any?
@@ -449,117 +448,21 @@ final class AutoClickSimulator: ObservableObject {
 
     // MARK: - Event creation
 
-    private let mouseDownEventMap: [NSEvent.EventType: CGEventType] = [
-        .leftMouseDown: .leftMouseDown, .leftMouseUp: .leftMouseDown,
-        .rightMouseDown: .rightMouseDown, .rightMouseUp: .rightMouseDown,
-        .otherMouseDown: .otherMouseDown, .otherMouseUp: .otherMouseDown
-    ]
-
-    private let mouseUpEventMap: [NSEvent.EventType: CGEventType] = [
-        .leftMouseDown: .leftMouseUp, .leftMouseUp: .leftMouseUp,
-        .rightMouseDown: .rightMouseUp, .rightMouseUp: .rightMouseUp,
-        .otherMouseDown: .otherMouseUp, .otherMouseUp: .otherMouseUp
-    ]
-
-    private let mouseButtonEventMap: [NSEvent.EventType: CGMouseButton] = [
-        .leftMouseDown: .left, .leftMouseUp: .left,
-        .rightMouseDown: .right, .rightMouseUp: .right,
-        .otherMouseDown: .center, .otherMouseUp: .center
-    ]
-
-    private func modifierFlags(for input: Input) -> CGEventFlags {
-        var flags = CGEventFlags()
-
-        if input.modifiers.contains(.command) { flags.insert(.maskCommand) }
-        if input.modifiers.contains(.control) { flags.insert(.maskControl) }
-        if input.modifiers.contains(.option) { flags.insert(.maskAlternate) }
-        if input.modifiers.contains(.shift) { flags.insert(.maskShift) }
-
-        switch input.keyCode {
-        case 55, 54: flags.insert(.maskCommand)
-        case 56, 60: flags.insert(.maskShift)
-        case 58, 61: flags.insert(.maskAlternate)
-        case 59, 62: flags.insert(.maskControl)
-        default: break
-        }
-
-        return flags
-    }
-
+    /// All event construction lives in `MacroEventFactory` so the looping simulator and the
+    ///  independent one-shot runs post identical events for identical inputs.
     private func generateMouseClickEvents(source: CGEventSource?, input: Input) -> [CGEvent] {
-        guard let downType = mouseDownEventMap[input.type],
-              let upType = mouseUpEventMap[input.type] else {
-            return []
-        }
-
-        let screenHeight = NSScreen.main?.frame.height ?? NSScreen.screens.first?.frame.height ?? 0
-        let point = CGPoint(x: self.mouseLocation.x,
-                            y: screenHeight - self.mouseLocation.y)
-        let button = self.mouseButton(for: input)
-
-        let mouseDown = CGEvent(mouseEventSource: source,
-                                mouseType: downType,
-                                mouseCursorPosition: point,
-                                mouseButton: button)
-        let mouseUp = CGEvent(mouseEventSource: source,
-                              mouseType: upType,
-                              mouseCursorPosition: point,
-                              mouseButton: button)
-
-        let flags = self.modifierFlags(for: input)
-        mouseDown?.flags = flags
-        mouseUp?.flags = flags
-
-        return [mouseDown, mouseUp].compactMap { $0 }
-    }
-
-    /// Side buttons travel as `otherMouse` events with their real button number in `keyCode`.
-    private func mouseButton(for input: Input) -> CGMouseButton {
-        guard let mapped = mouseButtonEventMap[input.type] else { return .left }
-
-        guard mapped == .center, input.keyCode > 2 else { return mapped }
-        return CGMouseButton(rawValue: UInt32(input.keyCode)) ?? mapped
-    }
-
-    private func generateKeyPressEvents(source: CGEventSource?, input: Input) -> [CGEvent] {
-        let keyDown = CGEvent(keyboardEventSource: source,
-                              virtualKey: CGKeyCode(input.keyCode),
-                              keyDown: true)
-        let keyUp = CGEvent(keyboardEventSource: source,
-                            virtualKey: CGKeyCode(input.keyCode),
-                            keyDown: false)
-
-        let flags = self.modifierFlags(for: input)
-        keyDown?.flags = flags
-        keyUp?.flags = flags
-
-        return [keyDown, keyUp].compactMap { $0 }
-    }
-
-    private func generateKeyReleaseEvents(source: CGEventSource?, input: Input) -> [CGEvent] {
-        guard let keyUp = CGEvent(keyboardEventSource: source,
-                                  virtualKey: CGKeyCode(input.keyCode),
-                                  keyDown: false) else {
-            return []
-        }
-        keyUp.flags = self.modifierFlags(for: input)
-        return [keyUp]
+        MacroEventFactory.pressEvents(source: source, input: input)
     }
 
     private func generateMouseReleaseEvents(source: CGEventSource?, input: Input) -> [CGEvent] {
-        guard let upType = mouseUpEventMap[input.type],
-              let mouseUp = CGEvent(mouseEventSource: source,
-                                    mouseType: upType,
-                                    mouseCursorPosition: CGPoint(
-                                        x: self.mouseLocation.x,
-                                        y: (NSScreen.main?.frame.height
-                                            ?? NSScreen.screens.first?.frame.height
-                                            ?? 0) - self.mouseLocation.y
-                                    ),
-                                    mouseButton: self.mouseButton(for: input)) else {
-            return []
-        }
-        mouseUp.flags = self.modifierFlags(for: input)
-        return [mouseUp]
+        MacroEventFactory.releaseEvents(source: source, input: input)
+    }
+
+    private func generateKeyPressEvents(source: CGEventSource?, input: Input) -> [CGEvent] {
+        MacroEventFactory.pressEvents(source: source, input: input)
+    }
+
+    private func generateKeyReleaseEvents(source: CGEventSource?, input: Input) -> [CGEvent] {
+        MacroEventFactory.releaseEvents(source: source, input: input)
     }
 }

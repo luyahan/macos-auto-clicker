@@ -16,7 +16,7 @@ struct Input: Codable, Defaults.Serializable, Hashable {
     var isMouseInput: Bool
     var isRepeat: Bool
 
-    enum Modifier: String, Codable {
+    enum Modifier: String, Codable, Hashable {
         case command = "⌘",
              control = "^",
              option = "⌥",

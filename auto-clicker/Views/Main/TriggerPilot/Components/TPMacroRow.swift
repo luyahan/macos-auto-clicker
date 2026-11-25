@@ -5,6 +5,9 @@
 //  Nodes 2:327–2:331. A selected row carries the accent tint and stroke; the rest are a flat 4%
 //  white wash. Rows are 63pt tall with a 12pt radius and 11pt of leading gap to the radio.
 //
+//  Looping macros keep the radio (mutually exclusive arm). One-shot macros use an independent
+//  switch instead, because several of them can be enabled at the same time.
+//
 
 import SwiftUI
 
@@ -12,8 +15,11 @@ struct TPMacroRow: View {
     let macro: Macro
     let isSelected: Bool
 
-    /// Tapping the radio arms or disarms the macro. Kept separate from `onEdit` so that hitting
-    ///  the circle never pops the settings panel open.
+    /// One-shot rows draw a switch rather than a radio.
+    var showsSwitch: Bool = false
+
+    /// Tapping the radio or switch arms or disarms the macro. Kept separate from `onEdit` so that
+    ///  hitting the control never pops the settings panel open.
     let onToggleActive: () -> Void
 
     /// Tapping anywhere else on the row opens the macro's settings panel.
@@ -29,7 +35,19 @@ struct TPMacroRow: View {
 
     var body: some View {
         HStack(spacing: 11) {
-            TPRadio(isOn: self.isSelected, onTap: self.onToggleActive)
+            if self.showsSwitch {
+                TPSwitch(
+                    isOn: Binding(
+                        get: { self.isSelected },
+                        set: { _ in self.onToggleActive() }
+                    ),
+                    width: 28,
+                    height: 17
+                )
+                .frame(width: 17)
+            } else {
+                TPRadio(isOn: self.isSelected, onTap: self.onToggleActive)
+            }
 
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 8) {
@@ -38,6 +56,13 @@ struct TPMacroRow: View {
                         .foregroundColor(self.titleColour)
                         .lineLimit(1)
                         .truncationMode(.tail)
+
+                    if self.macro.activation == .oneShot, let trigger = self.macro.trigger {
+                        Text(trigger.displayLabel)
+                            .font(TPType.mono(10))
+                            .foregroundColor(TPPalette.accentLabel)
+                            .lineLimit(1)
+                    }
 
                     Spacer(minLength: 0)
 

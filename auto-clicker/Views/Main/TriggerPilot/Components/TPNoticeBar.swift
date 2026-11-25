@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-/// The thin informational strip that sits between the title bar and the macro list, telling the
-///  user that only one macro can be armed at a time.
+/// The thin informational strip that sits between the title bar and the macro list, explaining the
+///  split between the single armed looping macro and the independently enabled one-shot macros.
 struct TPNoticeBar: View {
     var body: some View {
         HStack(spacing: 8) {

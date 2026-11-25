@@ -12,10 +12,12 @@ struct TriggerPilotView: View {
     @StateObject private var store = MacroStore.shared
     @StateObject private var runner = MacroRunner.shared
     @StateObject private var counter = TriggerCounter.shared
+    @StateObject private var coordinator = MacroRunCoordinator.shared
 
     @State private var editingMacro: Macro?
 
-    /// The title bar switch reflects the run, and flips it when tapped.
+    /// The title bar switch reflects the looping macro's run, and flips it when tapped. One-shot
+    ///  macros have their own switches in the list and are never driven from here.
     private var isEnabled: Binding<Bool> {
         Binding(
             get: { self.runner.isRunning },
@@ -42,18 +44,42 @@ struct TriggerPilotView: View {
                     TPNoticeBar()
 
                     ScrollView(.vertical, showsIndicators: false) {
-                        VStack(spacing: TPMetrics.macroRowSpacing) {
-                            ForEach(self.store.macros) { macro in
-                                TPMacroRow(macro: macro,
-                                           isSelected: macro.id == self.store.activeMacro?.id,
-                                           onToggleActive: {
-                                               self.store.activate(macro)
-                                           },
-                                           onEdit: {
-                                               self.editingMacro = macro
-                                           })
+                        VStack(alignment: .leading, spacing: TPMetrics.macroRowSpacing) {
+                            if !self.store.repeatingMacros.isEmpty {
+                                self.sectionHeader("macro_section_repeating",
+                                                   comment: "Looping macros section header")
+
+                                ForEach(self.store.repeatingMacros) { macro in
+                                    TPMacroRow(macro: macro,
+                                               isSelected: macro.id == self.store.activeMacro?.id,
+                                               onToggleActive: {
+                                                   self.store.activate(macro)
+                                               },
+                                               onEdit: {
+                                                   self.editingMacro = macro
+                                               })
+                                }
+                            }
+
+                            if !self.store.oneShotMacros.isEmpty {
+                                self.sectionHeader("macro_section_one_shot",
+                                                   comment: "One-shot macros section header")
+
+                                ForEach(self.store.oneShotMacros) { macro in
+                                    TPMacroRow(macro: macro,
+                                               isSelected: macro.isEnabled,
+                                               showsSwitch: true,
+                                               onToggleActive: {
+                                                   self.store.setEnabled(!macro.isEnabled,
+                                                                         for: macro.id)
+                                               },
+                                               onEdit: {
+                                                   self.editingMacro = macro
+                                               })
+                                }
                             }
                         }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .frame(maxHeight: .infinity)
 
@@ -64,8 +90,8 @@ struct TriggerPilotView: View {
                 .padding(.horizontal, TPMetrics.bodyPadding)
                 .padding(.vertical, TPMetrics.bodyPadding)
 
-                TPFootBar(statusText: self.statusText) {
-                    self.store.add()
+                TPFootBar(statusText: self.statusText) { activation in
+                    self.store.add(activation: activation)
                     self.editingMacro = self.store.macros.last
                 }
             }
@@ -89,8 +115,16 @@ struct TriggerPilotView: View {
         }
     }
 
+    private func sectionHeader(_ key: String, comment: String) -> some View {
+        Text(NSLocalizedString(key, comment: comment))
+            .font(TPType.text(10, weight: .medium))
+            .foregroundColor(TPPalette.textMuted)
+            .padding(.leading, 2)
+            .padding(.top, 2)
+    }
+
     private var statusText: String {
-        if self.runner.isRunning {
+        if self.runner.isRunning || self.coordinator.activeRunCount > 0 {
             return NSLocalizedString("macro_status_running", comment: "Macro is running")
         }
 

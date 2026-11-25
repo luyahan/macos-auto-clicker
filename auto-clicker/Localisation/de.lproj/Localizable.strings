@@ -131,11 +131,11 @@
 
 "app_title" = "TriggerPilot";
 
-"macro_exclusive_notice"      = "Es ist immer nur ein Makro aktiv, beim Umschalten werden alle anderen deaktiviert";
+"macro_exclusive_notice"      = "1 Schleifen-Makro und mehrere Einmal-Makros koennen gleichzeitig aktiv sein";
 "macro_add"                   = "Neues Makro";
 "macro_status_listening"      = "Aktiv";
 "macro_stat_saved"            = "Gespeicherte Makros";
-"macro_stat_active"           = "Aktiv";
+"macro_stat_active"           = "Aktiviert";
 "macro_stat_triggered"        = "Heute ausgeloest";
 
 "macro_key_count"             = "%lld Tasten";
@@ -186,10 +186,28 @@
 "macro_slot_add"              = "Taste hinzufuegen";
 
 "macro_status_running"        = "Laeuft";
-"macro_error_none_armed"      = "Kein Makro aktiv, bitte zuerst links einen Kreis anklicken";
+"macro_error_none_armed"      = "Globaler Start gilt nur fuer Schleifen-Makros; Einmal-Makros ueber ihren Schalter aktivieren";
 "macro_error_no_key"          = "Dieses Makro hat nur Modifikatortasten";
 "macro_error_simultaneous_multi_key" = "\"Gleichzeitig\" erlaubt nur eine normale Taste, weitere werden ignoriert";
 "macro_error_target_missing"  = "Bitte zuerst eine Ziel-App auswaehlen";
 "macro_started_title"         = "Gestartet: %@";
 "macro_error_no_permission"   = "Bitte zuerst in den Systemeinstellungen den Zugriff auf Bedienungshilfen erlauben";
 "macro_error_long_press_multi_key" = "\"Langes Druecken\" erlaubt nur eine Taste, weitere werden ignoriert";
+
+/* Einmal-Makros */
+
+"macro_activation_repeating"  = "Schleife";
+"macro_activation_one_shot"   = "Einmalig";
+"macro_field_activation"      = "Makro-Typ";
+"macro_field_trigger"         = "Ausloeser";
+"macro_trigger_capture"       = "Aufzeichnen";
+"macro_one_shot_hint"         = "Ein Druck fuehrt genau eine Runde aus; mehrere koennen gleichzeitig aktiv sein";
+"macro_one_shot_options_hint" = "Einmal-Makros fuehren genau 1 Runde ohne Verzoegerung aus";
+"macro_section_repeating"     = "Schleife (nur 1 aktiv)";
+"macro_section_one_shot"      = "Einmalig (mehrere aktiv)";
+"macro_add_repeating"         = "Neues Schleifen-Makro";
+"macro_add_one_shot"          = "Neues Einmal-Makro";
+"macro_untitled_one_shot"     = "Unbenanntes Einmal-Makro %d";
+"macro_error_trigger_missing" = "Bitte zuerst eine Taste oder Maustaste als Ausloeser aufzeichnen";
+"macro_error_trigger_shortcut" = "Der Ausloeser kollidiert mit dem globalen Start/Stop-Kuerzel";
+"macro_error_trigger_conflict" = "Dieser Ausloeser wird bereits von \"%@\" verwendet";

@@ -62,11 +62,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
         // TCC can be changed while the app is running. Refresh on activation so the UI and the
         // permission-gated execution path see the current state.
         PermissionsService.shared.refresh()
+
+        // A TCC grant can arrive while the app is running. Reinstall the read-only global trigger
+        //  monitor so keyboard triggers start working without a relaunch.
+        MacroTriggerService.shared.restart()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         // Cancel work and release any held key/mouse button before the process disappears.
         MacroRunner.shared.stop()
+        MacroRunCoordinator.shared.stopAll()
+        MacroTriggerService.shared.stop()
         PermissionsService.shared.stopPolling()
     }
 

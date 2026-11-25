@@ -186,10 +186,22 @@ struct Macro: Codable, Identifiable, Hashable, Defaults.Serializable {
     var targetBundleIdentifier: String?
     var targetApplicationName: String?
 
+    /// `.repeating` keeps the original single-armed loop; `.oneShot` fires one round from its own
+    ///  trigger. Decoded with a default so every stored macro from earlier builds stays a loop.
+    var activation: MacroActivation
+
+    /// The input that fires a `.oneShot` macro. Ignored for `.repeating` macros.
+    var trigger: MacroTrigger?
+
+    /// Independent arm state for `.oneShot` macros. Unlike `activeMacroID`, several of these can
+    ///  be true at once, which is the whole point of the one-shot group.
+    var isEnabled: Bool
+
     private enum CodingKeys: String, CodingKey {
         case id, name, caps, mode, repeatCount, delayEnabled, delaySeconds, intervalMilliseconds
         case roundIntervalMilliseconds
         case executionScope, targetBundleIdentifier, targetApplicationName
+        case activation, trigger, isEnabled
     }
 }
 
@@ -204,7 +216,9 @@ extension Macro {
     init(name: String, caps: [KeyCap], mode: TriggerMode, repeatCount: Int = 1,
          delayEnabled: Bool = false, delaySeconds: Double = 1.5, intervalMilliseconds: Int = 300,
             roundIntervalMilliseconds: Int = 300, executionScope: MacroExecutionScope = .global,
-            targetBundleIdentifier: String? = nil, targetApplicationName: String? = nil) {
+            targetBundleIdentifier: String? = nil, targetApplicationName: String? = nil,
+            activation: MacroActivation = .repeating, trigger: MacroTrigger? = nil,
+            isEnabled: Bool = false) {
         self.id = UUID()
         self.name = name
         self.caps = caps
@@ -217,6 +231,9 @@ extension Macro {
         self.executionScope = executionScope
         self.targetBundleIdentifier = targetBundleIdentifier
         self.targetApplicationName = targetApplicationName
+        self.activation = activation
+        self.trigger = trigger
+        self.isEnabled = isEnabled
     }
 }
 
@@ -238,6 +255,9 @@ extension Macro {
         self.executionScope = try container.decodeIfPresent(MacroExecutionScope.self, forKey: .executionScope) ?? .global
         self.targetBundleIdentifier = try container.decodeIfPresent(String.self, forKey: .targetBundleIdentifier)
         self.targetApplicationName = try container.decodeIfPresent(String.self, forKey: .targetApplicationName)
+        self.activation = try container.decodeIfPresent(MacroActivation.self, forKey: .activation) ?? .repeating
+        self.trigger = try container.decodeIfPresent(MacroTrigger.self, forKey: .trigger)
+        self.isEnabled = try container.decodeIfPresent(Bool.self, forKey: .isEnabled) ?? false
     }
 
     /// The `"4 键"` badge shown at the trailing edge of a macro row.
@@ -317,6 +337,29 @@ extension Macro {
         }
     }
 
+    /// Why a one-shot macro cannot listen, or `nil` when its trigger is usable.
+    ///
+    /// Kept apart from `unsupportedReason` (which is about the key combination's shape) so the
+    ///  settings panel can show the right message for each.
+    var triggerIssue: String? {
+        guard self.activation == .oneShot else { return nil }
+
+        guard let trigger = self.trigger, trigger.isValid else {
+            return "macro_error_trigger_missing"
+        }
+
+        if trigger.conflictsWithGlobalShortcut {
+            return "macro_error_trigger_shortcut"
+        }
+
+        return nil
+    }
+
+    /// Everything that would stop this macro from running, checked by both execution paths.
+    var runIssue: String? {
+        self.unsupportedReason ?? self.triggerIssue
+    }
+
     /// Returns a macro whose persisted values are safe to execute.
     ///
     /// `Codable` decoding only supplies defaults; it does not clamp ranges. A hand-edited or
@@ -338,6 +381,15 @@ extension Macro {
             result.targetBundleIdentifier = trimmed.isEmpty ? nil : trimmed
         }
 
+        // A one-shot macro is one round by definition. A hand-edited preference file must not be
+        // able to turn a trigger press into a 9999-round loop with a 24-hour start delay.
+        if result.activation == .oneShot {
+            result.repeatCount = 1
+            result.delayEnabled = false
+            result.delaySeconds = 0
+            result.trigger = result.trigger?.normalized
+        }
+
         return result
     }
 
@@ -351,8 +403,10 @@ extension Macro {
         state.pressInputs = self.pressInputs
         // One press per tick; the repetition is expressed through `repeatAmount`.
         state.pressAmount = 1
-        state.repeatAmount = max(1, self.repeatCount)
-        state.startDelay = self.delayEnabled ? max(0, Int(self.delaySeconds.rounded())) : 0
+        state.repeatAmount = self.activation == .oneShot ? 1 : max(1, self.repeatCount)
+        state.startDelay = self.activation == .oneShot
+            ? 0
+            : (self.delayEnabled ? max(0, Int(self.delaySeconds.rounded())) : 0)
 
         // Every mode repeats whole rounds, so the gap between rounds is the one timing all three
         //  share. It is what the simulator's timer is scheduled on.
